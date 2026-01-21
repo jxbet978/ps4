@@ -1,0 +1,25 @@
+{
+  "name": "banco-falabella-sistema",
+  "version": "1.0.0",
+  "description": "Sistema de gestión con Socket.IO y Telegram Bot",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [
+    "socketio",
+    "telegram",
+    "express"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.6.1",
+    "node-telegram-bot-api": "^0.61.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+}

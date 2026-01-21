@@ -1,0 +1,612 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background-color: #003b7a;
+    color: white;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.avatar {
+    width: 32px;
+    height: 32px;
+    background-color: #4a90e2;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.nav-icons {
+    display: flex;
+    gap: 1rem;
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.main-nav {
+    display: flex;
+    padding: 1rem;
+    background-color: white;
+    border-bottom: 1px solid #eee;
+}
+
+.nav-btn {
+    background: none;
+    border: none;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    font-size: 1rem;
+    color: #666;
+    position: relative;
+}
+
+.nav-btn.active {
+    color: #003b7a;
+    font-weight: bold;
+    border-bottom: 2px solid #003b7a;
+}
+
+.dot {
+    color: #ff0000;
+}
+
+.main-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.products-section {
+    background-color: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.action-icons {
+    display: flex;
+    gap: 1rem;
+}
+
+.account-info {
+    padding: 1rem;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+}
+
+.account-number, .tag {
+    color: #666;
+    margin: 0.5rem 0;
+}
+
+.balance-section {
+    margin-top: 1.5rem;
+}
+
+.balance-amount {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #003b7a;
+}
+
+.decimals {
+    font-size: 1.2rem;
+}
+
+.quick-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.action-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.8rem 1.5rem;
+    background-color: #e8f0fe;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #003b7a;
+}
+
+.carousel-section {
+    margin: 2rem 0;
+    position: relative;
+    max-width: 800px;
+    margin: 2rem auto;
+}
+
+.carousel {
+    display: flex;
+    overflow: hidden;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    height: 300px;
+    background-color: #f8f9fa;
+}
+
+.carousel-img {
+    width: 100%;
+    height: 100%;
+    display: none;
+    object-fit: contain;
+}
+
+.carousel-img.active {
+    display: block;
+}
+
+.carousel-dots {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    position: absolute;
+    bottom: 1rem;
+    left: 0;
+    right: 0;
+    z-index: 10;
+}
+
+.carousel-dots .dot {
+    width: 8px;
+    height: 8px;
+    background-color: #ccc;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.carousel-dots .dot.active {
+    background-color: #003b7a;
+}
+
+.recommendations {
+    background-color: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    margin-top: 2rem;
+}
+
+.recommendations h3 {
+    color: #003b7a;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.recommendation-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    padding: 1rem 0;
+}
+
+.card {
+    padding: 1.5rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: #fff;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    border-color: #003b7a;
+}
+
+.card .icon {
+    font-size: 2.5rem;
+    display: block;
+    margin-bottom: 1rem;
+    color: #003b7a;
+}
+
+.card span:not(.icon) {
+    color: #333;
+    font-weight: 500;
+    font-size: 1.1rem;
+}
+
+/* ===============================
+   RESPONSIVE DESIGN
+   =============================== */
+
+@media (max-width: 992px) {
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1rem 0.75rem;
+    }
+
+    .user-info {
+        width: 100%;
+    }
+
+    .nav-icons {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+    }
+
+    .icon-btn {
+        flex: 1 1 45%;
+        justify-content: center;
+        padding: 0.5rem;
+        font-size: 0.85rem;
+    }
+
+    .main-content {
+        padding: 0.75rem;
+    }
+
+    .products-section {
+        padding: 1rem;
+    }
+
+    .balance-amount {
+        font-size: 1.75rem;
+    }
+
+    .recommendation-cards {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .header {
+        padding: 0.75rem 0.5rem;
+    }
+
+    .avatar {
+        width: 28px;
+        height: 28px;
+        font-size: 0.85rem;
+    }
+
+    .greeting {
+        font-size: 0.9rem;
+    }
+
+    .icon-btn {
+        font-size: 0.8rem;
+        padding: 0.4rem;
+        gap: 0.3rem;
+    }
+
+    .main-nav {
+        padding: 0.75rem;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .nav-btn {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.9rem;
+        white-space: nowrap;
+    }
+
+    .products-section {
+        padding: 0.75rem;
+        border-radius: 6px;
+        margin-bottom: 1rem;
+    }
+
+    .section-header h2 {
+        font-size: 1.25rem;
+    }
+
+    .account-info {
+        padding: 0.75rem;
+    }
+
+    .account-info h3 {
+        font-size: 1rem;
+    }
+
+    .account-number,
+    .tag {
+        font-size: 0.85rem;
+    }
+
+    .balance-amount {
+        font-size: 1.5rem;
+    }
+
+    .decimals {
+        font-size: 1rem;
+    }
+
+    .quick-actions {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .action-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 0.7rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .carousel {
+        height: 220px;
+    }
+
+    .carousel-dots {
+        bottom: 0.75rem;
+    }
+
+    .recommendations {
+        padding: 1.25rem;
+        border-radius: 8px;
+    }
+
+    .recommendations h3 {
+        font-size: 1.25rem;
+        margin-bottom: 1rem;
+    }
+
+    .recommendation-cards {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 0.75rem;
+    }
+
+    .card {
+        padding: 1rem;
+    }
+
+    .card .icon {
+        font-size: 2rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .card span:not(.icon) {
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .header {
+        padding: 0.5rem;
+    }
+
+    .user-info {
+        gap: 0.5rem;
+    }
+
+    .avatar {
+        width: 24px;
+        height: 24px;
+        font-size: 0.75rem;
+    }
+
+    .greeting {
+        font-size: 0.85rem;
+    }
+
+    .icon-btn {
+        flex: 1 1 100%;
+        font-size: 0.75rem;
+    }
+
+    .main-nav {
+        padding: 0.5rem;
+    }
+
+    .nav-btn {
+        padding: 0.35rem 0.6rem;
+        font-size: 0.85rem;
+    }
+
+    .main-content {
+        padding: 0.5rem;
+    }
+
+    .products-section {
+        padding: 0.6rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .section-header h2 {
+        font-size: 1.1rem;
+    }
+
+    .account-info {
+        padding: 0.6rem;
+    }
+
+    .account-info h3 {
+        font-size: 0.95rem;
+    }
+
+    .balance-amount {
+        font-size: 1.35rem;
+    }
+
+    .balance-section {
+        margin-top: 1rem;
+    }
+
+    .action-btn {
+        padding: 0.6rem 0.85rem;
+        font-size: 0.85rem;
+    }
+
+    .carousel {
+        height: 180px;
+        border-radius: 8px;
+    }
+
+    .carousel-dots .dot {
+        width: 6px;
+        height: 6px;
+    }
+
+    .recommendations {
+        padding: 1rem 0.75rem;
+    }
+
+    .recommendations h3 {
+        font-size: 1.1rem;
+    }
+
+    .recommendation-cards {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 0.6rem;
+    }
+
+    .card {
+        padding: 0.85rem 0.5rem;
+        border-radius: 8px;
+    }
+
+    .card .icon {
+        font-size: 1.75rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .card span:not(.icon) {
+        font-size: 0.85rem;
+        line-height: 1.3;
+    }
+}
+
+@media (max-width: 360px) {
+    .greeting {
+        font-size: 0.8rem;
+    }
+
+    .icon-btn {
+        font-size: 0.7rem;
+        padding: 0.35rem;
+    }
+
+    .balance-amount {
+        font-size: 1.2rem;
+    }
+
+    .carousel {
+        height: 160px;
+    }
+
+    .recommendation-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .card {
+        padding: 0.75rem;
+    }
+}
+
+/* ===============================
+   LANDSCAPE MODE
+   =============================== */
+
+@media (max-height: 500px) and (orientation: landscape) {
+    .header {
+        padding: 0.5rem;
+    }
+
+    .carousel {
+        height: 140px;
+    }
+
+    .main-content {
+        padding: 0.5rem;
+    }
+
+    .products-section,
+    .recommendations {
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* ===============================
+   PRINT STYLES
+   =============================== */
+
+@media print {
+    .header,
+    .main-nav,
+    .quick-actions,
+    .carousel-section,
+    .recommendations {
+        display: none;
+    }
+
+    .products-section {
+        box-shadow: none;
+        border: 1px solid #ccc;
+    }
+}
+
+/* ===============================
+   ACCESIBILIDAD
+   =============================== */
+
+@media (prefers-reduced-motion: reduce) {
+    .carousel-img,
+    .card,
+    * {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* ===============================
+   HIGH CONTRAST MODE
+   =============================== */
+
+@media (prefers-contrast: high) {
+    .header {
+        border-bottom: 2px solid #000;
+    }
+
+    .card {
+        border: 2px solid #003b7a;
+    }
+
+    .nav-btn.active {
+        border-bottom: 3px solid #003b7a;
+    }
+}

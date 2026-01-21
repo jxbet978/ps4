@@ -1,0 +1,459 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #ffffff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.header {
+  background: linear-gradient(135deg, #2d5f3f 0%, #1a3d28 100%);
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  height: 40px;
+  width: auto;
+}
+
+.language-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: rgba(255, 255, 255, 0.15);
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.language-selector:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+}
+
+.flag-icon {
+  width: 24px;
+  height: 24px;
+  background-color: #fff;
+  border-radius: 2px;
+}
+
+.language-text {
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px;
+  position: relative;
+}
+
+.form-container {
+  width: 100%;
+  max-width: 420px;
+  background-color: #ffffff;
+  padding: 0;
+  position: relative;
+  z-index: 10;
+}
+
+.welcome-title {
+  color: #2d5f3f;
+  font-size: 22px;
+  font-weight: 400;
+  margin-bottom: 30px;
+  text-align: left;
+}
+
+.input-group {
+  margin-bottom: 20px;
+}
+
+.input-field {
+  width: 100%;
+  padding: 14px 16px;
+  font-size: 15px;
+  border: 1px solid #d1d1d1;
+  border-radius: 4px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.input-field:focus {
+  border-color: #5fa8d3;
+  box-shadow: 0 0 0 3px rgba(95, 168, 211, 0.1);
+}
+
+.input-field::placeholder {
+  color: #999;
+}
+
+/* Password Input with Eye Icon */
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input-wrapper .input-field {
+  padding-right: 45px;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  transition: color 0.2s;
+}
+
+.toggle-password:hover {
+  color: #2d5f3f;
+}
+
+.eye-icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* Button */
+.btn-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 25px;
+}
+
+.btn-siguiente {
+  background-color: #c5d9e8;
+  color: #ffffff;
+  padding: 12px 32px;
+  border: none;
+  border-radius: 4px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: not-allowed;
+  transition: background-color 0.2s, transform 0.1s;
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.btn-siguiente.active {
+  background-color: #5fa8d3;
+  cursor: pointer;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.btn-siguiente.active:hover {
+  background-color: #4d96c1;
+}
+
+.btn-siguiente.active:active {
+  transform: scale(0.98);
+}
+
+/* Links */
+.links-container {
+  margin-top: 30px;
+  text-align: center;
+}
+
+.link-text {
+  color: #2d5f3f;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.link-primary {
+  color: #5fa8d3;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.link-primary:hover {
+  text-decoration: underline;
+}
+
+.link-secondary {
+  color: #5fa8d3;
+  text-decoration: none;
+  display: block;
+  margin-top: 12px;
+  font-size: 14px;
+}
+
+.link-secondary:hover {
+  text-decoration: underline;
+}
+
+/* Back Button */
+.back-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #2d5f3f;
+  text-decoration: none;
+  font-size: 16px;
+  margin-bottom: 25px;
+  cursor: pointer;
+  transition: color 0.2s;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.back-button:hover {
+  color: #1a3d28;
+}
+
+.back-arrow {
+  width: 24px;
+  height: 24px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+
+/* Image Verification Section */
+.image-verification {
+  margin: 25px 0;
+  display: none;
+  align-items: flex-start;
+  gap: 15px;
+}
+
+.checkbox-container {
+  position: relative;
+  margin-top: 4px;
+}
+
+.checkbox-input {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #5fa8d3;
+}
+
+.verification-text {
+  flex: 1;
+  color: #666;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* Footer Image */
+.footer-image {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: auto;
+  height: 280px;
+  max-width: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+  opacity: 0.9;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.footer-text {
+  position: fixed;
+  bottom: 10px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 11px;
+  color: #666;
+  z-index: 2;
+}
+
+/* Loading Overlay */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.95);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.loading-overlay.show {
+  display: flex;
+  opacity: 1;
+}
+
+.loading-content {
+  text-align: center;
+}
+
+.loading-logo {
+  width: 120px;
+  height: auto;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(0.95);
+  }
+}
+
+.loading-text {
+  margin-top: 20px;
+  color: #2d5f3f;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* Dynamic Key Specific Styles */
+.dynamic-key-input {
+  text-align: center;
+  font-size: 24px;
+  letter-spacing: 8px;
+  font-weight: 500;
+}
+
+/* OTP Input Specific Styles */
+.otp-input {
+  text-align: center;
+  font-size: 20px;
+  letter-spacing: 6px;
+  font-weight: 500;
+}
+
+/* Cancel Button */
+.btn-cancelar {
+  background-color: transparent;
+  color: #5fa8d3;
+  padding: 12px 32px;
+  border: none;
+  border-radius: 4px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-right: 10px;
+}
+
+.btn-cancelar:hover {
+  background-color: rgba(95, 168, 211, 0.1);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .header {
+    padding: 10px 15px;
+  }
+
+  .logo {
+    height: 32px;
+  }
+
+  .main-content {
+    padding: 30px 15px;
+  }
+
+  .form-container {
+    max-width: 100%;
+  }
+
+  .welcome-title {
+    font-size: 19px;
+  }
+
+  .input-field {
+    padding: 12px 14px;
+    font-size: 14px;
+  }
+
+  .btn-siguiente {
+    padding: 11px 28px;
+    font-size: 14px;
+  }
+
+  .footer-image {
+    height: 220px;
+  }
+
+  .dynamic-key-input {
+    font-size: 20px;
+    letter-spacing: 6px;
+  }
+
+  .otp-input {
+    font-size: 18px;
+    letter-spacing: 4px;
+  }
+}
+
+@media (max-width: 480px) {
+  .language-selector {
+    padding: 4px 8px;
+  }
+
+  .language-text {
+    font-size: 12px;
+  }
+
+  .welcome-title {
+    font-size: 17px;
+    margin-bottom: 25px;
+  }
+
+  .btn-siguiente {
+    width: 100%;
+  }
+
+  .btn-container {
+    justify-content: stretch;
+  }
+
+  .footer-image {
+    height: 180px;
+  }
+}

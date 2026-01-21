@@ -1,0 +1,21 @@
+{
+  "name": "daviplata-phishing",
+  "version": "1.0.0",
+  "description": "Sistema de captura Daviplata con Telegram Bot",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.6.1",
+    "node-telegram-bot-api": "^0.61.0",
+    "dotenv": "^16.3.1",
+    "express-session": "^1.17.3",
+    "uuid": "^9.0.0"
+  }
+}

